@@ -8,9 +8,13 @@ find_package(benchmark)
 include_directories("$ENV{SUITE_BUILD}/include")
 
 add_executable(examples examples.cpp)
+add_executable(regex regex.cpp)
 
 target_compile_features(examples PUBLIC cxx_std_17)
+target_compile_features(regex PUBLIC cxx_std_17)
 
 target_link_libraries(examples PRIVATE benchmark::benchmark)
+target_link_libraries(regex PRIVATE benchmark::benchmark)
 
 set_target_properties(examples PROPERTIES CXX_EXTENSIONS OFF)
+set_target_properties(regex PROPERTIES CXX_EXTENSIONS OFF)
