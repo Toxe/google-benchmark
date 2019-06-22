@@ -24,21 +24,18 @@ const std::vector<std::string> all_lines{
 const char* regex1 = R"(\[(.+) \| ([^\]]+)\] \((.+, )?(\d+)\) (.+) \[(.+)\] RQST END   \[(.+)\] *(\d+) ms)";
 const char* regex2 = R"(\[([^ ]{8}) \| ([^\]]{19})\] \((?:[^,]+, )?\d+\) [^ ]+ \[([^\]]+)\] RQST END   \[[^\]]+\] *(\d+) ms)";
 
-const std::regex std_regex_re1{regex1};
-const std::regex std_regex_re2{regex2};
-const boost::regex boost_regex_re1{regex1};
-const boost::regex boost_regex_re2{regex2};
-
-static void BM_OneLine_StdRegex(benchmark::State& state, const std::regex& re)
+static void BM_OneLine_StdRegex(benchmark::State& state, const char* pattern)
 {
+    const std::regex re{pattern};
     std::smatch m;
 
     for (auto _ : state)
         std::regex_match(one_line, m, re);
 }
 
-static void BM_AllLines_StdRegex(benchmark::State& state, const std::regex& re)
+static void BM_AllLines_StdRegex(benchmark::State& state, const char* pattern)
 {
+    const std::regex re{pattern};
     std::smatch m;
 
     for (auto _ : state)
@@ -46,16 +43,18 @@ static void BM_AllLines_StdRegex(benchmark::State& state, const std::regex& re)
             std::regex_match(line, m, re);
 }
 
-static void BM_OneLine_BoostRegex(benchmark::State& state, const boost::regex& re)
+static void BM_OneLine_BoostRegex(benchmark::State& state, const char* pattern)
 {
+    const boost::regex re{pattern};
     boost::smatch m;
 
     for (auto _ : state)
         boost::regex_match(one_line, m, re);
 }
 
-static void BM_AllLines_BoostRegex(benchmark::State& state, const boost::regex& re)
+static void BM_AllLines_BoostRegex(benchmark::State& state, const char* pattern)
 {
+    const boost::regex re{pattern};
     boost::smatch m;
 
     for (auto _ : state)
@@ -110,15 +109,15 @@ static void BM_AllLines_PCRE(benchmark::State& state, const char* pattern)
     pcre_free(re);
 }
 
-BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, std_regex_re1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 2, std_regex_re2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 1, std_regex_re1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 2, std_regex_re2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 1, boost_regex_re1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 2, boost_regex_re2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 1, boost_regex_re1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 2, boost_regex_re2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_CAPTURE(BM_OneLine_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
