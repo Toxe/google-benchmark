@@ -1,6 +1,9 @@
+#define OVECCOUNT 30
+
 #include <benchmark/benchmark.h>
 #include <boost/regex.hpp>
 #include <iostream>
+#include <pcre.h>
 #include <regex>
 
 const std::string one_line{"[00180D0F | 2009-09-15 09:34:48] (193.98.108.243:39170, 879) /cmd.php [co_search.browse] RQST END   [normal]   799 ms"};
@@ -60,13 +63,66 @@ static void BM_AllLines_BoostRegex(benchmark::State& state, const boost::regex& 
             boost::regex_match(line, m, re);
 }
 
+static void BM_OneLine_PCRE(benchmark::State& state, const char* pattern)
+{
+    const char* error;
+    int erroroffset;
+    int ovector[OVECCOUNT];
+
+    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE compilation failed"};
+
+    pcre_extra* sd = pcre_study(re, 0, &error);
+
+    if (!sd && error)
+        throw std::runtime_error{"PCRE study error"};
+
+    for (auto _ : state)
+        pcre_exec(re, sd, one_line.c_str(), one_line.size(), 0, 0, ovector, OVECCOUNT);
+
+    pcre_free_study(sd);
+    pcre_free(re);
+}
+
+static void BM_AllLines_PCRE(benchmark::State& state, const char* pattern)
+{
+    const char* error;
+    int erroroffset;
+    int ovector[OVECCOUNT];
+
+    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE compilation failed"};
+
+    pcre_extra* sd = pcre_study(re, 0, &error);
+
+    if (!sd && error)
+        throw std::runtime_error{"PCRE study error"};
+
+    for (auto _ : state)
+        for (auto line : all_lines)
+            pcre_exec(re, sd, line.c_str(), line.size(), 0, 0, ovector, OVECCOUNT);
+
+    pcre_free_study(sd);
+    pcre_free(re);
+}
+
 BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, std_regex_re1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 2, std_regex_re2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 1, std_regex_re1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 2, std_regex_re2)->Unit(benchmark::kMicrosecond);
+
 BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 1, boost_regex_re1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 2, boost_regex_re2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 1, boost_regex_re1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 2, boost_regex_re2)->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_CAPTURE(BM_OneLine_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_MAIN();
