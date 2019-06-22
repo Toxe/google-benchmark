@@ -1,9 +1,11 @@
 #define OVECCOUNT 30
+#define PCRE2_CODE_UNIT_WIDTH 8
 
 #include <benchmark/benchmark.h>
 #include <boost/regex.hpp>
 #include <iostream>
 #include <pcre.h>
+#include <pcre2.h>
 #include <regex>
 
 const std::string one_line{"[00180D0F | 2009-09-15 09:34:48] (193.98.108.243:39170, 879) /cmd.php [co_search.browse] RQST END   [normal]   799 ms"};
@@ -109,6 +111,56 @@ static void BM_AllLines_PCRE(benchmark::State& state, const char* pattern)
     pcre_free(re);
 }
 
+static void BM_OneLine_PCRE2(benchmark::State& state, const char* pattern)
+{
+    int errorcode;
+    PCRE2_SIZE erroroffset;
+
+    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE2 compilation failed"};
+
+    pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(re, nullptr);
+
+    if (!match_data)
+        throw std::runtime_error{"PCRE2 unable to create match data"};
+
+    for (auto _ : state) {
+        const PCRE2_SPTR subject = (PCRE2_SPTR) one_line.c_str();
+        pcre2_match(re, subject, one_line.size(), 0, 0, match_data, nullptr);
+    }
+
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
+}
+
+static void BM_AllLines_PCRE2(benchmark::State& state, const char* pattern)
+{
+    int errorcode;
+    PCRE2_SIZE erroroffset;
+
+    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE2 compilation failed"};
+
+    pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(re, nullptr);
+
+    if (!match_data)
+        throw std::runtime_error{"PCRE2 unable to create match data"};
+
+    for (auto _ : state) {
+        for (auto line : all_lines) {
+            const PCRE2_SPTR subject = (PCRE2_SPTR) line.c_str();
+            pcre2_match(re, subject, line.size(), 0, 0, match_data, nullptr);
+        }
+    }
+
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
+}
+
 BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
@@ -123,5 +175,10 @@ BENCHMARK_CAPTURE(BM_OneLine_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_MAIN();
