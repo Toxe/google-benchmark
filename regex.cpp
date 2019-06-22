@@ -19,34 +19,26 @@ const std::vector<std::string> all_lines{
 const std::regex std_regex_re1{R"(\[(.+) \| ([^\]]+)\] \((.+, )?(\d+)\) (.+) \[(.+)\] RQST END   \[(.+)\] *(\d+) ms)"};
 const std::regex std_regex_re2{R"(\[([^ ]{8}) \| ([^\]]{19})\] \((?:[^,]+, )?\d+\) [^ ]+ \[([^\]]+)\] RQST END   \[[^\]]+\] *(\d+) ms)"};
 
-static void BM_OneLine_Match_StdString_Regex(benchmark::State& state, const std::regex& re)
+static void BM_OneLine_StdRegex(benchmark::State& state, const std::regex& re)
 {
     std::smatch m;
-    int found = 0;
 
     for (auto _ : state)
-        if (std::regex_match(one_line, m, re))
-            ++found;
-
-    state.counters["found"] = found;
+        std::regex_match(one_line, m, re);
 }
 
-static void BM_AllLines_Match_StdString_Regex(benchmark::State& state, const std::regex& re)
+static void BM_AllLines_StdRegex(benchmark::State& state, const std::regex& re)
 {
     std::smatch m;
-    int found = 0;
 
     for (auto _ : state)
         for (auto line : all_lines)
-            if (std::regex_match(line, m, re))
-                ++found;
-
-    state.counters["found"] = found;
+            std::regex_match(line, m, re);
 }
 
-BENCHMARK_CAPTURE(BM_OneLine_Match_StdString_Regex, 1, std_regex_re1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_Match_StdString_Regex, 2, std_regex_re2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_Match_StdString_Regex, 1, std_regex_re1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_Match_StdString_Regex, 2, std_regex_re2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, std_regex_re1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 2, std_regex_re2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 1, std_regex_re1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 2, std_regex_re2)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_MAIN();
