@@ -27,7 +27,7 @@ const std::vector<std::string> all_lines{
 const char* regex1 = R"(\[(.+) \| ([^\]]+)\] \((.+, )?(\d+)\) (.+) \[(.+)\] RQST END   \[(.+)\] *(\d+) ms)";
 const char* regex2 = R"(\[([^ ]{8}) \| ([^\]]{19})\] \((?:[^,]+, )?\d+\) [^ ]+ \[([^\]]+)\] RQST END   \[[^\]]+\] *(\d+) ms)";
 
-std::size_t check_std_match(const std::string& line, const std::regex& re, std::smatch& m)
+std::size_t check_std_regex(const std::string& line, const std::regex& re, std::smatch& m)
 {
     std::size_t length = 0;
 
@@ -39,7 +39,7 @@ std::size_t check_std_match(const std::string& line, const std::regex& re, std::
     return length;
 }
 
-std::size_t check_boost_match(const std::string& line, const boost::regex& re, boost::smatch& m)
+std::size_t check_boost_regex(const std::string& line, const boost::regex& re, boost::smatch& m)
 {
     std::size_t length = 0;
 
@@ -51,7 +51,7 @@ std::size_t check_boost_match(const std::string& line, const boost::regex& re, b
     return length;
 }
 
-std::size_t check_pcre_match(const std::string& line, const pcre* re, const pcre_extra* sd)
+std::size_t check_pcre(const std::string& line, const pcre* re, const pcre_extra* sd)
 {
     std::size_t length = 0;
     int ovector[OVECCOUNT];
@@ -70,7 +70,7 @@ std::size_t check_pcre_match(const std::string& line, const pcre* re, const pcre
     return length;
 }
 
-std::size_t check_pcre_jit_match(const std::string& line, const pcre* re, const pcre_extra* sd, pcre_jit_stack* jit_stack)
+std::size_t check_pcre_jit(const std::string& line, const pcre* re, const pcre_extra* sd, pcre_jit_stack* jit_stack)
 {
     std::size_t length = 0;
     int ovector[OVECCOUNT];
@@ -89,7 +89,7 @@ std::size_t check_pcre_jit_match(const std::string& line, const pcre* re, const 
     return length;
 }
 
-std::size_t check_pcre2_match(const std::string& line, const pcre2_code* re, pcre2_match_data* match_data)
+std::size_t check_pcre2(const std::string& line, const pcre2_code* re, pcre2_match_data* match_data)
 {
     std::size_t length = 0;
     const PCRE2_SPTR subject = (PCRE2_SPTR) line.c_str();
@@ -110,7 +110,7 @@ std::size_t check_pcre2_match(const std::string& line, const pcre2_code* re, pcr
     return length;
 }
 
-std::size_t check_pcre2_jit_match(const std::string& line, const pcre2_code* re, pcre2_match_data* match_data, pcre2_match_context* mcontext)
+std::size_t check_pcre2_jit(const std::string& line, const pcre2_code* re, pcre2_match_data* match_data, pcre2_match_context* mcontext)
 {
     std::size_t length = 0;
     const PCRE2_SPTR subject = (PCRE2_SPTR) line.c_str();
@@ -150,7 +150,7 @@ static void BM_OneLine_StdRegex(benchmark::State& state, const char* pattern)
     std::smatch m;
 
     for (auto _ : state)
-        length += check_std_match(one_line, re, m);
+        length += check_std_regex(one_line, re, m);
 
     state.counters["length"] = length;
 }
@@ -163,7 +163,7 @@ static void BM_AllLines_StdRegex(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : all_lines)
-            length += check_std_match(line, re, m);
+            length += check_std_regex(line, re, m);
 
     state.counters["length"] = length;
 }
@@ -178,7 +178,7 @@ static void BM_Logfile_StdRegex(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : lines)
-            length += check_std_match(line, re, m);
+            length += check_std_regex(line, re, m);
 
     state.counters["length"] = length;
 }
@@ -190,7 +190,7 @@ static void BM_OneLine_BoostRegex(benchmark::State& state, const char* pattern)
     boost::smatch m;
 
     for (auto _ : state)
-        length += check_boost_match(one_line, re, m);
+        length += check_boost_regex(one_line, re, m);
 
     state.counters["length"] = length;
 }
@@ -203,7 +203,7 @@ static void BM_AllLines_BoostRegex(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : all_lines)
-            length += check_boost_match(line, re, m);
+            length += check_boost_regex(line, re, m);
 
     state.counters["length"] = length;
 }
@@ -218,7 +218,7 @@ static void BM_Logfile_BoostRegex(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : lines)
-            length += check_boost_match(line, re, m);
+            length += check_boost_regex(line, re, m);
 
     state.counters["length"] = length;
 }
@@ -273,7 +273,7 @@ static void BM_OneLine_PCRE(benchmark::State& state, const char* pattern)
     auto [re, sd] = init_pcre(pattern);
 
     for (auto _ : state)
-        length += check_pcre_match(one_line, re, sd);
+        length += check_pcre(one_line, re, sd);
 
     pcre_free_study(sd);
     pcre_free(re);
@@ -289,7 +289,7 @@ static void BM_AllLines_PCRE(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : all_lines)
-            length += check_pcre_match(line, re, sd);
+            length += check_pcre(line, re, sd);
 
     pcre_free_study(sd);
     pcre_free(re);
@@ -306,7 +306,7 @@ static void BM_Logfile_PCRE(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : lines)
-            length += check_pcre_match(line, re, sd);
+            length += check_pcre(line, re, sd);
 
     pcre_free_study(sd);
     pcre_free(re);
@@ -321,7 +321,7 @@ static void BM_OneLine_PCRE_JIT(benchmark::State& state, const char* pattern)
     auto [re, sd, jit_stack] = init_pcre_jit(pattern);
 
     for (auto _ : state)
-        length += check_pcre_jit_match(one_line, re, sd, jit_stack);
+        length += check_pcre_jit(one_line, re, sd, jit_stack);
 
     pcre_jit_stack_free(jit_stack);
     pcre_free_study(sd);
@@ -338,7 +338,7 @@ static void BM_AllLines_PCRE_JIT(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : all_lines)
-            length += check_pcre_jit_match(line, re, sd, jit_stack);
+            length += check_pcre_jit(line, re, sd, jit_stack);
 
     pcre_jit_stack_free(jit_stack);
     pcre_free_study(sd);
@@ -356,7 +356,7 @@ static void BM_Logfile_PCRE_JIT(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : lines)
-            length += check_pcre_jit_match(line, re, sd, jit_stack);
+            length += check_pcre_jit(line, re, sd, jit_stack);
 
     pcre_jit_stack_free(jit_stack);
     pcre_free_study(sd);
@@ -423,7 +423,7 @@ static void BM_OneLine_PCRE2(benchmark::State& state, const char* pattern)
     auto [re, match_data] = init_pcre2(pattern);
 
     for (auto _ : state)
-        length += check_pcre2_match(one_line, re, match_data);
+        length += check_pcre2(one_line, re, match_data);
 
     pcre2_match_data_free(match_data);
     pcre2_code_free(re);
@@ -439,7 +439,7 @@ static void BM_AllLines_PCRE2(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : all_lines)
-            length += check_pcre2_match(line, re, match_data);
+            length += check_pcre2(line, re, match_data);
 
     pcre2_match_data_free(match_data);
     pcre2_code_free(re);
@@ -456,7 +456,7 @@ static void BM_Logfile_PCRE2(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : lines)
-            length += check_pcre2_match(line, re, match_data);
+            length += check_pcre2(line, re, match_data);
 
     pcre2_match_data_free(match_data);
     pcre2_code_free(re);
@@ -471,7 +471,7 @@ static void BM_OneLine_PCRE2_JIT(benchmark::State& state, const char* pattern)
     auto [re, mcontext, jit_stack, match_data] = init_pcre2_jit(pattern);
 
     for (auto _ : state)
-        length += check_pcre2_jit_match(one_line, re, match_data, mcontext);
+        length += check_pcre2_jit(one_line, re, match_data, mcontext);
 
     pcre2_match_data_free(match_data);
     pcre2_jit_stack_free(jit_stack);
@@ -489,7 +489,7 @@ static void BM_AllLines_PCRE2_JIT(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : all_lines)
-            length += check_pcre2_jit_match(line, re, match_data, mcontext);
+            length += check_pcre2_jit(line, re, match_data, mcontext);
 
     pcre2_match_data_free(match_data);
     pcre2_jit_stack_free(jit_stack);
@@ -511,7 +511,7 @@ static void BM_Logfile_PCRE2_JIT(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : lines)
-            length += check_pcre2_jit_match(line, re, match_data, mcontext);
+            length += check_pcre2_jit(line, re, match_data, mcontext);
 
     pcre2_match_data_free(match_data);
     pcre2_jit_stack_free(jit_stack);
