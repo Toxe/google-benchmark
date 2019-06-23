@@ -3,6 +3,7 @@
 
 #include <benchmark/benchmark.h>
 #include <boost/regex.hpp>
+#include <fstream>
 #include <iostream>
 #include <pcre.h>
 #include <pcre2.h>
@@ -90,6 +91,18 @@ std::size_t check_pcre2_match(const std::string& line, const pcre2_code* re, pcr
     return length;
 }
 
+std::vector<std::string> load_logfile()
+{
+    std::ifstream in("../logfile.txt");
+    std::vector<std::string> lines;
+    std::string line;
+
+    while (std::getline(in, line))
+        lines.push_back(line);
+
+    return lines;
+}
+
 static void BM_OneLine_StdRegex(benchmark::State& state, const char* pattern)
 {
     std::size_t length = 0;
@@ -115,6 +128,21 @@ static void BM_AllLines_StdRegex(benchmark::State& state, const char* pattern)
     state.counters["length"] = length;
 }
 
+static void BM_Logfile_StdRegex(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    const std::regex re{pattern};
+    std::smatch m;
+
+    auto lines = load_logfile();
+
+    for (auto _ : state)
+        for (auto line : lines)
+            length += check_std_match(line, re, m);
+
+    state.counters["length"] = length;
+}
+
 static void BM_OneLine_BoostRegex(benchmark::State& state, const char* pattern)
 {
     std::size_t length = 0;
@@ -135,6 +163,21 @@ static void BM_AllLines_BoostRegex(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : all_lines)
+            length += check_boost_match(line, re, m);
+
+    state.counters["length"] = length;
+}
+
+static void BM_Logfile_BoostRegex(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    const boost::regex re{pattern};
+    boost::smatch m;
+
+    auto lines = load_logfile();
+
+    for (auto _ : state)
+        for (auto line : lines)
             length += check_boost_match(line, re, m);
 
     state.counters["length"] = length;
@@ -183,6 +226,34 @@ static void BM_AllLines_PCRE(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : all_lines)
+            length += check_pcre_match(line, re, sd);
+
+    pcre_free_study(sd);
+    pcre_free(re);
+
+    state.counters["length"] = length;
+}
+
+static void BM_Logfile_PCRE(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    const char* error;
+    int erroroffset;
+
+    auto lines = load_logfile();
+
+    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE compilation failed"};
+
+    pcre_extra* sd = pcre_study(re, 0, &error);
+
+    if (!sd && error)
+        throw std::runtime_error{"PCRE study error"};
+
+    for (auto _ : state)
+        for (auto line : lines)
             length += check_pcre_match(line, re, sd);
 
     pcre_free_study(sd);
@@ -242,6 +313,34 @@ static void BM_AllLines_PCRE2(benchmark::State& state, const char* pattern)
     state.counters["length"] = length;
 }
 
+static void BM_Logfile_PCRE2(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    int errorcode;
+    PCRE2_SIZE erroroffset;
+
+    auto lines = load_logfile();
+
+    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE2 compilation failed"};
+
+    pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(re, nullptr);
+
+    if (!match_data)
+        throw std::runtime_error{"PCRE2 unable to create match data"};
+
+    for (auto _ : state)
+        for (auto line : lines)
+            length += check_pcre2_match(line, re, match_data);
+
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
+
+    state.counters["length"] = length;
+}
+
 BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
@@ -261,5 +360,15 @@ BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond
 BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_CAPTURE(BM_Logfile_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_CAPTURE(BM_Logfile_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_MAIN();
