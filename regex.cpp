@@ -70,12 +70,52 @@ std::size_t check_pcre_match(const std::string& line, const pcre* re, const pcre
     return length;
 }
 
+std::size_t check_pcre_jit_match(const std::string& line, const pcre* re, const pcre_extra* sd, pcre_jit_stack* jit_stack)
+{
+    std::size_t length = 0;
+    int ovector[OVECCOUNT];
+
+    const int rc = pcre_jit_exec(re, sd, line.c_str(), line.size(), 0, 0, ovector, OVECCOUNT, jit_stack);
+
+    if (rc > 1) {
+        for (int i = 1; i < rc; ++i) {
+            const char* substring_start = line.c_str() + ovector[2*i];
+            const int substring_length = ovector[2*i + 1] - ovector[2*i];
+            const std::string_view s{substring_start, (std::size_t) substring_length};
+            length += s.size();
+        }
+    }
+
+    return length;
+}
+
 std::size_t check_pcre2_match(const std::string& line, const pcre2_code* re, pcre2_match_data* match_data)
 {
     std::size_t length = 0;
     const PCRE2_SPTR subject = (PCRE2_SPTR) line.c_str();
 
     const int rc = pcre2_match(re, subject, line.size(), 0, 0, match_data, nullptr);
+
+    if (rc > 1) {
+        const PCRE2_SIZE* ovector = pcre2_get_ovector_pointer(match_data);
+
+        for (int i = 1; i < rc; ++i) {
+            const PCRE2_SPTR substring_start = subject + ovector[2*i];
+            const int substring_length = ovector[2*i + 1] - ovector[2*i];
+            const std::string_view s{(const char*) substring_start, (std::size_t) substring_length};
+            length += s.size();
+        }
+    }
+
+    return length;
+}
+
+std::size_t check_pcre2_jit_match(const std::string& line, const pcre2_code* re, pcre2_match_data* match_data, pcre2_match_context* mcontext)
+{
+    std::size_t length = 0;
+    const PCRE2_SPTR subject = (PCRE2_SPTR) line.c_str();
+
+    const int rc = pcre2_jit_match(re, subject, line.size(), 0, 0, match_data, mcontext);
 
     if (rc > 1) {
         const PCRE2_SIZE* ovector = pcre2_get_ovector_pointer(match_data);
@@ -262,6 +302,109 @@ static void BM_Logfile_PCRE(benchmark::State& state, const char* pattern)
     state.counters["length"] = length;
 }
 
+static void BM_OneLine_PCRE_JIT(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    const char* error;
+    int erroroffset;
+
+    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE compilation failed"};
+
+    pcre_extra* sd = pcre_study(re, PCRE_STUDY_JIT_COMPILE, &error);
+
+    if (!sd && error)
+        throw std::runtime_error{"PCRE study error"};
+
+    pcre_jit_stack* jit_stack = pcre_jit_stack_alloc(32*1024, 512*1024);
+
+    if (!jit_stack)
+        throw std::runtime_error{"PCRE JIT stack alloc error"};
+
+    pcre_assign_jit_stack(sd, nullptr, jit_stack);
+
+    for (auto _ : state)
+        length += check_pcre_jit_match(one_line, re, sd, jit_stack);
+
+    pcre_jit_stack_free(jit_stack);
+    pcre_free_study(sd);
+    pcre_free(re);
+
+    state.counters["length"] = length;
+}
+
+static void BM_AllLines_PCRE_JIT(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    const char* error;
+    int erroroffset;
+
+    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE compilation failed"};
+
+    pcre_extra* sd = pcre_study(re, PCRE_STUDY_JIT_COMPILE, &error);
+
+    if (!sd && error)
+        throw std::runtime_error{"PCRE study error"};
+
+    pcre_jit_stack* jit_stack = pcre_jit_stack_alloc(32*1024, 512*1024);
+
+    if (!jit_stack)
+        throw std::runtime_error{"PCRE JIT stack alloc error"};
+
+    pcre_assign_jit_stack(sd, nullptr, jit_stack);
+
+    for (auto _ : state)
+        for (auto line : all_lines)
+            length += check_pcre_jit_match(line, re, sd, jit_stack);
+
+    pcre_jit_stack_free(jit_stack);
+    pcre_free_study(sd);
+    pcre_free(re);
+
+    state.counters["length"] = length;
+}
+
+static void BM_Logfile_PCRE_JIT(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    const char* error;
+    int erroroffset;
+
+    auto lines = load_logfile();
+
+    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE compilation failed"};
+
+    pcre_extra* sd = pcre_study(re, PCRE_STUDY_JIT_COMPILE, &error);
+
+    if (!sd && error)
+        throw std::runtime_error{"PCRE study error"};
+
+    pcre_jit_stack* jit_stack = pcre_jit_stack_alloc(32*1024, 512*1024);
+
+    if (!jit_stack)
+        throw std::runtime_error{"PCRE JIT stack alloc error"};
+
+    pcre_assign_jit_stack(sd, nullptr, jit_stack);
+
+    for (auto _ : state)
+        for (auto line : lines)
+            length += check_pcre_jit_match(line, re, sd, jit_stack);
+
+    pcre_jit_stack_free(jit_stack);
+    pcre_free_study(sd);
+    pcre_free(re);
+
+    state.counters["length"] = length;
+}
+
 static void BM_OneLine_PCRE2(benchmark::State& state, const char* pattern)
 {
     std::size_t length = 0;
@@ -341,34 +484,176 @@ static void BM_Logfile_PCRE2(benchmark::State& state, const char* pattern)
     state.counters["length"] = length;
 }
 
+static void BM_OneLine_PCRE2_JIT(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    int errorcode;
+    PCRE2_SIZE erroroffset;
+
+    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE2 compilation failed"};
+
+    if (pcre2_jit_compile(re, PCRE2_JIT_COMPLETE) < 0)
+        throw std::runtime_error{"PCRE2 JIT compile error"};
+
+    pcre2_match_context* mcontext = pcre2_match_context_create(nullptr);
+
+    if (!mcontext)
+        throw std::runtime_error{"PCRE2 unable to create match context"};
+
+    pcre2_jit_stack* jit_stack = pcre2_jit_stack_create(32*1024, 512*1024, nullptr);
+
+    if (!jit_stack)
+        throw std::runtime_error{"PCRE2 unable to create JIT stack"};
+
+    pcre2_jit_stack_assign(mcontext, nullptr, jit_stack);
+
+    pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(re, nullptr);
+
+    if (!match_data)
+        throw std::runtime_error{"PCRE2 unable to create match data"};
+
+    for (auto _ : state)
+        length += check_pcre2_jit_match(one_line, re, match_data, mcontext);
+
+    pcre2_match_data_free(match_data);
+    pcre2_jit_stack_free(jit_stack);
+    pcre2_match_context_free(mcontext);
+    pcre2_code_free(re);
+
+    state.counters["length"] = length;
+}
+
+static void BM_AllLines_PCRE2_JIT(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    int errorcode;
+    PCRE2_SIZE erroroffset;
+
+    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE2 compilation failed"};
+
+    if (pcre2_jit_compile(re, PCRE2_JIT_COMPLETE) < 0)
+        throw std::runtime_error{"PCRE2 JIT compile error"};
+
+    pcre2_match_context* mcontext = pcre2_match_context_create(nullptr);
+
+    if (!mcontext)
+        throw std::runtime_error{"PCRE2 unable to create match context"};
+
+    pcre2_jit_stack* jit_stack = pcre2_jit_stack_create(32*1024, 512*1024, nullptr);
+
+    if (!jit_stack)
+        throw std::runtime_error{"PCRE2 unable to create JIT stack"};
+
+    pcre2_jit_stack_assign(mcontext, nullptr, jit_stack);
+
+    pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(re, nullptr);
+
+    if (!match_data)
+        throw std::runtime_error{"PCRE2 unable to create match data"};
+
+    for (auto _ : state)
+        for (auto line : all_lines)
+            length += check_pcre2_jit_match(line, re, match_data, mcontext);
+
+    pcre2_match_data_free(match_data);
+    pcre2_jit_stack_free(jit_stack);
+    pcre2_match_context_free(mcontext);
+    pcre2_code_free(re);
+
+    state.counters["length"] = length;
+}
+
+static void BM_Logfile_PCRE2_JIT(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    int errorcode;
+    PCRE2_SIZE erroroffset;
+
+    auto lines = load_logfile();
+
+    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE2 compilation failed"};
+
+    if (pcre2_jit_compile(re, PCRE2_JIT_COMPLETE) < 0)
+        throw std::runtime_error{"PCRE2 JIT compile error"};
+
+    pcre2_match_context* mcontext = pcre2_match_context_create(nullptr);
+
+    if (!mcontext)
+        throw std::runtime_error{"PCRE2 unable to create match context"};
+
+    pcre2_jit_stack* jit_stack = pcre2_jit_stack_create(32*1024, 512*1024, nullptr);
+
+    if (!jit_stack)
+        throw std::runtime_error{"PCRE2 unable to create JIT stack"};
+
+    pcre2_jit_stack_assign(mcontext, nullptr, jit_stack);
+
+    pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(re, nullptr);
+
+    if (!match_data)
+        throw std::runtime_error{"PCRE2 unable to create match data"};
+
+    for (auto _ : state)
+        for (auto line : lines)
+            length += check_pcre2_jit_match(line, re, match_data, mcontext);
+
+    pcre2_match_data_free(match_data);
+    pcre2_jit_stack_free(jit_stack);
+    pcre2_match_context_free(mcontext);
+    pcre2_code_free(re);
+
+    state.counters["length"] = length;
+}
+
 BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE2_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE2_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_CAPTURE(BM_Logfile_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_CAPTURE(BM_Logfile_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE2_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_MAIN();
