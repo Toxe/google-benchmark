@@ -26,49 +26,125 @@ const std::vector<std::string> all_lines{
 const char* regex1 = R"(\[(.+) \| ([^\]]+)\] \((.+, )?(\d+)\) (.+) \[(.+)\] RQST END   \[(.+)\] *(\d+) ms)";
 const char* regex2 = R"(\[([^ ]{8}) \| ([^\]]{19})\] \((?:[^,]+, )?\d+\) [^ ]+ \[([^\]]+)\] RQST END   \[[^\]]+\] *(\d+) ms)";
 
+std::size_t check_std_match(const std::string& line, const std::regex& re, std::smatch& m)
+{
+    std::size_t length = 0;
+
+    if (std::regex_match(line, m, re))
+        if (m.size() > 1)
+            for (int i = 1; i < m.size(); ++i)
+                length += m[i].length();
+
+    return length;
+}
+
+std::size_t check_boost_match(const std::string& line, const boost::regex& re, boost::smatch& m)
+{
+    std::size_t length = 0;
+
+    if (boost::regex_match(line, m, re))
+        if (m.size() > 1)
+            for (int i = 1; i < m.size(); ++i)
+                length += m[i].length();
+
+    return length;
+}
+
+std::size_t check_pcre_match(const std::string& line, const pcre* re, const pcre_extra* sd)
+{
+    std::size_t length = 0;
+    int ovector[OVECCOUNT];
+
+    const int rc = pcre_exec(re, sd, line.c_str(), line.size(), 0, 0, ovector, OVECCOUNT);
+
+    if (rc > 1) {
+        for (int i = 1; i < rc; ++i) {
+            const char* substring_start = line.c_str() + ovector[2*i];
+            const int substring_length = ovector[2*i + 1] - ovector[2*i];
+            const std::string_view s{substring_start, (std::size_t) substring_length};
+            length += s.size();
+        }
+    }
+
+    return length;
+}
+
+std::size_t check_pcre2_match(const std::string& line, const pcre2_code* re, pcre2_match_data* match_data)
+{
+    std::size_t length = 0;
+    const PCRE2_SPTR subject = (PCRE2_SPTR) line.c_str();
+
+    const int rc = pcre2_match(re, subject, line.size(), 0, 0, match_data, nullptr);
+
+    if (rc > 1) {
+        const PCRE2_SIZE* ovector = pcre2_get_ovector_pointer(match_data);
+
+        for (int i = 1; i < rc; ++i) {
+            const PCRE2_SPTR substring_start = subject + ovector[2*i];
+            const int substring_length = ovector[2*i + 1] - ovector[2*i];
+            const std::string_view s{(const char*) substring_start, (std::size_t) substring_length};
+            length += s.size();
+        }
+    }
+
+    return length;
+}
+
 static void BM_OneLine_StdRegex(benchmark::State& state, const char* pattern)
 {
+    std::size_t length = 0;
     const std::regex re{pattern};
     std::smatch m;
 
     for (auto _ : state)
-        std::regex_match(one_line, m, re);
+        length += check_std_match(one_line, re, m);
+
+    state.counters["length"] = length;
 }
 
 static void BM_AllLines_StdRegex(benchmark::State& state, const char* pattern)
 {
+    std::size_t length = 0;
     const std::regex re{pattern};
     std::smatch m;
 
     for (auto _ : state)
         for (auto line : all_lines)
-            std::regex_match(line, m, re);
+            length += check_std_match(line, re, m);
+
+    state.counters["length"] = length;
 }
 
 static void BM_OneLine_BoostRegex(benchmark::State& state, const char* pattern)
 {
+    std::size_t length = 0;
     const boost::regex re{pattern};
     boost::smatch m;
 
     for (auto _ : state)
-        boost::regex_match(one_line, m, re);
+        length += check_boost_match(one_line, re, m);
+
+    state.counters["length"] = length;
 }
 
 static void BM_AllLines_BoostRegex(benchmark::State& state, const char* pattern)
 {
+    std::size_t length = 0;
     const boost::regex re{pattern};
     boost::smatch m;
 
     for (auto _ : state)
         for (auto line : all_lines)
-            boost::regex_match(line, m, re);
+            length += check_boost_match(line, re, m);
+
+    state.counters["length"] = length;
 }
 
 static void BM_OneLine_PCRE(benchmark::State& state, const char* pattern)
 {
+    std::size_t length = 0;
     const char* error;
     int erroroffset;
-    int ovector[OVECCOUNT];
 
     pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
 
@@ -81,17 +157,19 @@ static void BM_OneLine_PCRE(benchmark::State& state, const char* pattern)
         throw std::runtime_error{"PCRE study error"};
 
     for (auto _ : state)
-        pcre_exec(re, sd, one_line.c_str(), one_line.size(), 0, 0, ovector, OVECCOUNT);
+        length += check_pcre_match(one_line, re, sd);
 
     pcre_free_study(sd);
     pcre_free(re);
+
+    state.counters["length"] = length;
 }
 
 static void BM_AllLines_PCRE(benchmark::State& state, const char* pattern)
 {
+    std::size_t length = 0;
     const char* error;
     int erroroffset;
-    int ovector[OVECCOUNT];
 
     pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
 
@@ -105,14 +183,17 @@ static void BM_AllLines_PCRE(benchmark::State& state, const char* pattern)
 
     for (auto _ : state)
         for (auto line : all_lines)
-            pcre_exec(re, sd, line.c_str(), line.size(), 0, 0, ovector, OVECCOUNT);
+            length += check_pcre_match(line, re, sd);
 
     pcre_free_study(sd);
     pcre_free(re);
+
+    state.counters["length"] = length;
 }
 
 static void BM_OneLine_PCRE2(benchmark::State& state, const char* pattern)
 {
+    std::size_t length = 0;
     int errorcode;
     PCRE2_SIZE erroroffset;
 
@@ -126,17 +207,18 @@ static void BM_OneLine_PCRE2(benchmark::State& state, const char* pattern)
     if (!match_data)
         throw std::runtime_error{"PCRE2 unable to create match data"};
 
-    for (auto _ : state) {
-        const PCRE2_SPTR subject = (PCRE2_SPTR) one_line.c_str();
-        pcre2_match(re, subject, one_line.size(), 0, 0, match_data, nullptr);
-    }
+    for (auto _ : state)
+        length += check_pcre2_match(one_line, re, match_data);
 
     pcre2_match_data_free(match_data);
     pcre2_code_free(re);
+
+    state.counters["length"] = length;
 }
 
 static void BM_AllLines_PCRE2(benchmark::State& state, const char* pattern)
 {
+    std::size_t length = 0;
     int errorcode;
     PCRE2_SIZE erroroffset;
 
@@ -150,15 +232,14 @@ static void BM_AllLines_PCRE2(benchmark::State& state, const char* pattern)
     if (!match_data)
         throw std::runtime_error{"PCRE2 unable to create match data"};
 
-    for (auto _ : state) {
-        for (auto line : all_lines) {
-            const PCRE2_SPTR subject = (PCRE2_SPTR) line.c_str();
-            pcre2_match(re, subject, line.size(), 0, 0, match_data, nullptr);
-        }
-    }
+    for (auto _ : state)
+        for (auto line : all_lines)
+            length += check_pcre2_match(line, re, match_data);
 
     pcre2_match_data_free(match_data);
     pcre2_code_free(re);
+
+    state.counters["length"] = length;
 }
 
 BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
