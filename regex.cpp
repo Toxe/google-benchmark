@@ -162,23 +162,23 @@ static void BM_AllLines_PCRE2(benchmark::State& state, const char* pattern)
 }
 
 BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
-
 BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
-
 BENCHMARK_CAPTURE(BM_OneLine_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
-
 BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_MAIN();
