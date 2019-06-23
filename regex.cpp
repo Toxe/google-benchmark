@@ -223,9 +223,8 @@ static void BM_Logfile_BoostRegex(benchmark::State& state, const char* pattern)
     state.counters["length"] = length;
 }
 
-static void BM_OneLine_PCRE(benchmark::State& state, const char* pattern)
+std::tuple<pcre*, pcre_extra*> init_pcre(const char* pattern)
 {
-    std::size_t length = 0;
     const char* error;
     int erroroffset;
 
@@ -238,6 +237,40 @@ static void BM_OneLine_PCRE(benchmark::State& state, const char* pattern)
 
     if (!sd && error)
         throw std::runtime_error{"PCRE study error"};
+
+    return std::make_tuple(re, sd);
+}
+
+std::tuple<pcre*, pcre_extra*, pcre_jit_stack*> init_pcre_jit(const char* pattern)
+{
+    const char* error;
+    int erroroffset;
+
+    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
+
+    if (!re)
+        throw std::runtime_error{"PCRE compilation failed"};
+
+    pcre_extra* sd = pcre_study(re, PCRE_STUDY_JIT_COMPILE, &error);
+
+    if (!sd && error)
+        throw std::runtime_error{"PCRE study error"};
+
+    pcre_jit_stack* jit_stack = pcre_jit_stack_alloc(32*1024, 512*1024);
+
+    if (!jit_stack)
+        throw std::runtime_error{"PCRE JIT stack alloc error"};
+
+    pcre_assign_jit_stack(sd, nullptr, jit_stack);
+
+    return std::make_tuple(re, sd, jit_stack);
+}
+
+static void BM_OneLine_PCRE(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+
+    auto [re, sd] = init_pcre(pattern);
 
     for (auto _ : state)
         length += check_pcre_match(one_line, re, sd);
@@ -251,18 +284,8 @@ static void BM_OneLine_PCRE(benchmark::State& state, const char* pattern)
 static void BM_AllLines_PCRE(benchmark::State& state, const char* pattern)
 {
     std::size_t length = 0;
-    const char* error;
-    int erroroffset;
 
-    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
-
-    if (!re)
-        throw std::runtime_error{"PCRE compilation failed"};
-
-    pcre_extra* sd = pcre_study(re, 0, &error);
-
-    if (!sd && error)
-        throw std::runtime_error{"PCRE study error"};
+    auto [re, sd] = init_pcre(pattern);
 
     for (auto _ : state)
         for (auto line : all_lines)
@@ -277,20 +300,9 @@ static void BM_AllLines_PCRE(benchmark::State& state, const char* pattern)
 static void BM_Logfile_PCRE(benchmark::State& state, const char* pattern)
 {
     std::size_t length = 0;
-    const char* error;
-    int erroroffset;
 
     auto lines = load_logfile();
-
-    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
-
-    if (!re)
-        throw std::runtime_error{"PCRE compilation failed"};
-
-    pcre_extra* sd = pcre_study(re, 0, &error);
-
-    if (!sd && error)
-        throw std::runtime_error{"PCRE study error"};
+    auto [re, sd] = init_pcre(pattern);
 
     for (auto _ : state)
         for (auto line : lines)
@@ -305,25 +317,8 @@ static void BM_Logfile_PCRE(benchmark::State& state, const char* pattern)
 static void BM_OneLine_PCRE_JIT(benchmark::State& state, const char* pattern)
 {
     std::size_t length = 0;
-    const char* error;
-    int erroroffset;
 
-    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
-
-    if (!re)
-        throw std::runtime_error{"PCRE compilation failed"};
-
-    pcre_extra* sd = pcre_study(re, PCRE_STUDY_JIT_COMPILE, &error);
-
-    if (!sd && error)
-        throw std::runtime_error{"PCRE study error"};
-
-    pcre_jit_stack* jit_stack = pcre_jit_stack_alloc(32*1024, 512*1024);
-
-    if (!jit_stack)
-        throw std::runtime_error{"PCRE JIT stack alloc error"};
-
-    pcre_assign_jit_stack(sd, nullptr, jit_stack);
+    auto [re, sd, jit_stack] = init_pcre_jit(pattern);
 
     for (auto _ : state)
         length += check_pcre_jit_match(one_line, re, sd, jit_stack);
@@ -338,25 +333,8 @@ static void BM_OneLine_PCRE_JIT(benchmark::State& state, const char* pattern)
 static void BM_AllLines_PCRE_JIT(benchmark::State& state, const char* pattern)
 {
     std::size_t length = 0;
-    const char* error;
-    int erroroffset;
 
-    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
-
-    if (!re)
-        throw std::runtime_error{"PCRE compilation failed"};
-
-    pcre_extra* sd = pcre_study(re, PCRE_STUDY_JIT_COMPILE, &error);
-
-    if (!sd && error)
-        throw std::runtime_error{"PCRE study error"};
-
-    pcre_jit_stack* jit_stack = pcre_jit_stack_alloc(32*1024, 512*1024);
-
-    if (!jit_stack)
-        throw std::runtime_error{"PCRE JIT stack alloc error"};
-
-    pcre_assign_jit_stack(sd, nullptr, jit_stack);
+    auto [re, sd, jit_stack] = init_pcre_jit(pattern);
 
     for (auto _ : state)
         for (auto line : all_lines)
@@ -372,27 +350,9 @@ static void BM_AllLines_PCRE_JIT(benchmark::State& state, const char* pattern)
 static void BM_Logfile_PCRE_JIT(benchmark::State& state, const char* pattern)
 {
     std::size_t length = 0;
-    const char* error;
-    int erroroffset;
 
     auto lines = load_logfile();
-
-    pcre* re = pcre_compile(pattern, 0, &error, &erroroffset, nullptr);
-
-    if (!re)
-        throw std::runtime_error{"PCRE compilation failed"};
-
-    pcre_extra* sd = pcre_study(re, PCRE_STUDY_JIT_COMPILE, &error);
-
-    if (!sd && error)
-        throw std::runtime_error{"PCRE study error"};
-
-    pcre_jit_stack* jit_stack = pcre_jit_stack_alloc(32*1024, 512*1024);
-
-    if (!jit_stack)
-        throw std::runtime_error{"PCRE JIT stack alloc error"};
-
-    pcre_assign_jit_stack(sd, nullptr, jit_stack);
+    auto [re, sd, jit_stack] = init_pcre_jit(pattern);
 
     for (auto _ : state)
         for (auto line : lines)
@@ -405,9 +365,8 @@ static void BM_Logfile_PCRE_JIT(benchmark::State& state, const char* pattern)
     state.counters["length"] = length;
 }
 
-static void BM_OneLine_PCRE2(benchmark::State& state, const char* pattern)
+std::tuple<pcre2_code*, pcre2_match_data*> init_pcre2(const char* pattern)
 {
-    std::size_t length = 0;
     int errorcode;
     PCRE2_SIZE erroroffset;
 
@@ -421,72 +380,11 @@ static void BM_OneLine_PCRE2(benchmark::State& state, const char* pattern)
     if (!match_data)
         throw std::runtime_error{"PCRE2 unable to create match data"};
 
-    for (auto _ : state)
-        length += check_pcre2_match(one_line, re, match_data);
-
-    pcre2_match_data_free(match_data);
-    pcre2_code_free(re);
-
-    state.counters["length"] = length;
+    return std::make_tuple(re, match_data);
 }
 
-static void BM_AllLines_PCRE2(benchmark::State& state, const char* pattern)
+std::tuple<pcre2_code*, pcre2_match_context*, pcre2_jit_stack*, pcre2_match_data*> init_pcre2_jit(const char* pattern)
 {
-    std::size_t length = 0;
-    int errorcode;
-    PCRE2_SIZE erroroffset;
-
-    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
-
-    if (!re)
-        throw std::runtime_error{"PCRE2 compilation failed"};
-
-    pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(re, nullptr);
-
-    if (!match_data)
-        throw std::runtime_error{"PCRE2 unable to create match data"};
-
-    for (auto _ : state)
-        for (auto line : all_lines)
-            length += check_pcre2_match(line, re, match_data);
-
-    pcre2_match_data_free(match_data);
-    pcre2_code_free(re);
-
-    state.counters["length"] = length;
-}
-
-static void BM_Logfile_PCRE2(benchmark::State& state, const char* pattern)
-{
-    std::size_t length = 0;
-    int errorcode;
-    PCRE2_SIZE erroroffset;
-
-    auto lines = load_logfile();
-
-    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
-
-    if (!re)
-        throw std::runtime_error{"PCRE2 compilation failed"};
-
-    pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(re, nullptr);
-
-    if (!match_data)
-        throw std::runtime_error{"PCRE2 unable to create match data"};
-
-    for (auto _ : state)
-        for (auto line : lines)
-            length += check_pcre2_match(line, re, match_data);
-
-    pcre2_match_data_free(match_data);
-    pcre2_code_free(re);
-
-    state.counters["length"] = length;
-}
-
-static void BM_OneLine_PCRE2_JIT(benchmark::State& state, const char* pattern)
-{
-    std::size_t length = 0;
     int errorcode;
     PCRE2_SIZE erroroffset;
 
@@ -514,6 +412,63 @@ static void BM_OneLine_PCRE2_JIT(benchmark::State& state, const char* pattern)
 
     if (!match_data)
         throw std::runtime_error{"PCRE2 unable to create match data"};
+
+    return std::make_tuple(re, mcontext, jit_stack, match_data);
+}
+
+static void BM_OneLine_PCRE2(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+
+    auto [re, match_data] = init_pcre2(pattern);
+
+    for (auto _ : state)
+        length += check_pcre2_match(one_line, re, match_data);
+
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
+
+    state.counters["length"] = length;
+}
+
+static void BM_AllLines_PCRE2(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+
+    auto [re, match_data] = init_pcre2(pattern);
+
+    for (auto _ : state)
+        for (auto line : all_lines)
+            length += check_pcre2_match(line, re, match_data);
+
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
+
+    state.counters["length"] = length;
+}
+
+static void BM_Logfile_PCRE2(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+
+    auto lines = load_logfile();
+    auto [re, match_data] = init_pcre2(pattern);
+
+    for (auto _ : state)
+        for (auto line : lines)
+            length += check_pcre2_match(line, re, match_data);
+
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
+
+    state.counters["length"] = length;
+}
+
+static void BM_OneLine_PCRE2_JIT(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+
+    auto [re, mcontext, jit_stack, match_data] = init_pcre2_jit(pattern);
 
     for (auto _ : state)
         length += check_pcre2_jit_match(one_line, re, match_data, mcontext);
@@ -529,33 +484,8 @@ static void BM_OneLine_PCRE2_JIT(benchmark::State& state, const char* pattern)
 static void BM_AllLines_PCRE2_JIT(benchmark::State& state, const char* pattern)
 {
     std::size_t length = 0;
-    int errorcode;
-    PCRE2_SIZE erroroffset;
 
-    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
-
-    if (!re)
-        throw std::runtime_error{"PCRE2 compilation failed"};
-
-    if (pcre2_jit_compile(re, PCRE2_JIT_COMPLETE) < 0)
-        throw std::runtime_error{"PCRE2 JIT compile error"};
-
-    pcre2_match_context* mcontext = pcre2_match_context_create(nullptr);
-
-    if (!mcontext)
-        throw std::runtime_error{"PCRE2 unable to create match context"};
-
-    pcre2_jit_stack* jit_stack = pcre2_jit_stack_create(32*1024, 512*1024, nullptr);
-
-    if (!jit_stack)
-        throw std::runtime_error{"PCRE2 unable to create JIT stack"};
-
-    pcre2_jit_stack_assign(mcontext, nullptr, jit_stack);
-
-    pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(re, nullptr);
-
-    if (!match_data)
-        throw std::runtime_error{"PCRE2 unable to create match data"};
+    auto [re, mcontext, jit_stack, match_data] = init_pcre2_jit(pattern);
 
     for (auto _ : state)
         for (auto line : all_lines)
@@ -572,32 +502,9 @@ static void BM_AllLines_PCRE2_JIT(benchmark::State& state, const char* pattern)
 static void BM_Logfile_PCRE2_JIT(benchmark::State& state, const char* pattern)
 {
     std::size_t length = 0;
-    int errorcode;
-    PCRE2_SIZE erroroffset;
 
     auto lines = load_logfile();
-
-    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
-
-    if (!re)
-        throw std::runtime_error{"PCRE2 compilation failed"};
-
-    if (pcre2_jit_compile(re, PCRE2_JIT_COMPLETE) < 0)
-        throw std::runtime_error{"PCRE2 JIT compile error"};
-
-    pcre2_match_context* mcontext = pcre2_match_context_create(nullptr);
-
-    if (!mcontext)
-        throw std::runtime_error{"PCRE2 unable to create match context"};
-
-    pcre2_jit_stack* jit_stack = pcre2_jit_stack_create(32*1024, 512*1024, nullptr);
-
-    if (!jit_stack)
-        throw std::runtime_error{"PCRE2 unable to create JIT stack"};
-
-    pcre2_jit_stack_assign(mcontext, nullptr, jit_stack);
-
-    pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(re, nullptr);
+    auto [re, mcontext, jit_stack, match_data] = init_pcre2_jit(pattern);
 
     if (!match_data)
         throw std::runtime_error{"PCRE2 unable to create match data"};
