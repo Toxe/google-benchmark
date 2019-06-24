@@ -27,6 +27,7 @@ const std::vector<std::string> all_lines{
 
 const char* regex1 = R"(\[(.+) \| ([^\]]+)\] \((.+, )?(\d+)\) (.+) \[(.+)\] RQST END   \[(.+)\] *(\d+) ms)";
 const char* regex2 = R"(\[([^ ]{8}) \| ([^\]]{19})\] \((?:[^,]+, )?\d+\) [^ ]+ \[([^\]]+)\] RQST END   \[[^\]]+\] *(\d+) ms)";
+const char* regex3 = R"(^\[([^ ]{8}) \| ([^\]]{19})\] \((?:[^,]+, )?\d+\) [^ ]+ \[([^\]]+)\] RQST END   \[[^\]]+\] *(\d+) ms)";
 
 std::size_t check_std_regex(const std::string& line, const std::regex& re, std::smatch& m)
 {
@@ -612,52 +613,70 @@ static void BM_Logfile_PCRE2_JIT(benchmark::State& state, const char* pattern)
     state.counters["length"] = length;
 }
 
-BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_RE2, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
-
-BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_RE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_OneLine_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE2_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE2_JIT, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_PCRE_JIT, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_RE2, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_RE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_RE2, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 3, regex3)->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_RE2, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
-
-BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_RE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_AllLines_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE2_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE2_JIT, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_PCRE_JIT, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_RE2, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_RE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_RE2, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 3, regex3)->Unit(benchmark::kMicrosecond);
 
-BENCHMARK_CAPTURE(BM_Logfile_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_Logfile_RE2, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_Logfile_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_Logfile_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_Logfile_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_Logfile_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
-
-BENCHMARK_CAPTURE(BM_Logfile_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_Logfile_RE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_BoostRegex, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
-BENCHMARK_CAPTURE(BM_Logfile_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE2, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE2_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE2_JIT, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_PCRE_JIT, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_RE2, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_RE2, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_RE2, 3, regex3)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_StdRegex, 3, regex3)->Unit(benchmark::kMicrosecond);
 
 BENCHMARK_MAIN();
