@@ -7,6 +7,7 @@
 #include <iostream>
 #include <pcre.h>
 #include <pcre2.h>
+#include <re2/re2.h>
 #include <regex>
 
 const std::string one_line{"[00180D0F | 2009-09-15 09:34:48] (193.98.108.243:39170, 879) /cmd.php [co_search.browse] RQST END   [normal]   799 ms"};
@@ -47,6 +48,17 @@ std::size_t check_boost_regex(const std::string& line, const boost::regex& re, b
         if (m.size() > 1)
             for (int i = 1; i < m.size(); ++i)
                 length += m[i].length();
+
+    return length;
+}
+
+std::size_t check_re2(const std::string& line, const re2::RE2& re, const std::vector<RE2::Arg*>& arguments_ptrs, const std::vector<std::string>& results, int args_count)
+{
+    std::size_t length = 0;
+
+    if (RE2::FullMatchN(line, re, arguments_ptrs.data(), args_count))
+        for (auto i = 0; i < args_count; ++i)
+            length += results[i].length();
 
     return length;
 }
@@ -219,6 +231,85 @@ static void BM_Logfile_BoostRegex(benchmark::State& state, const char* pattern)
     for (auto _ : state)
         for (auto line : lines)
             length += check_boost_regex(line, re, m);
+
+    state.counters["length"] = length;
+}
+
+static void BM_OneLine_RE2(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    const re2::RE2 re{pattern};
+
+    if (!re.ok())
+        throw std::runtime_error{"RE2 compilation error"};
+
+    int args_count = re.NumberOfCapturingGroups();
+
+    std::vector<RE2::Arg> arguments(args_count);
+    std::vector<RE2::Arg*> arguments_ptrs(args_count);
+    std::vector<std::string> results(args_count);
+
+    for (auto i = 0; i < args_count; ++i) {
+        arguments[i] = &results[i];
+        arguments_ptrs[i] = &arguments[i];
+    }
+
+    for (auto _ : state)
+        length += check_re2(one_line, re, arguments_ptrs, results, args_count);
+
+    state.counters["length"] = length;
+}
+
+static void BM_AllLines_RE2(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    const re2::RE2 re{pattern};
+
+    if (!re.ok())
+        throw std::runtime_error{"RE2 compilation error"};
+
+    int args_count = re.NumberOfCapturingGroups();
+
+    std::vector<RE2::Arg> arguments(args_count);
+    std::vector<RE2::Arg*> arguments_ptrs(args_count);
+    std::vector<std::string> results(args_count);
+
+    for (auto i = 0; i < args_count; ++i) {
+        arguments[i] = &results[i];
+        arguments_ptrs[i] = &arguments[i];
+    }
+
+    for (auto _ : state)
+        for (auto line : all_lines)
+            length += check_re2(line, re, arguments_ptrs, results, args_count);
+
+    state.counters["length"] = length;
+}
+
+static void BM_Logfile_RE2(benchmark::State& state, const char* pattern)
+{
+    std::size_t length = 0;
+    const re2::RE2 re{pattern};
+
+    if (!re.ok())
+        throw std::runtime_error{"RE2 compilation error"};
+
+    int args_count = re.NumberOfCapturingGroups();
+
+    std::vector<RE2::Arg> arguments(args_count);
+    std::vector<RE2::Arg*> arguments_ptrs(args_count);
+    std::vector<std::string> results(args_count);
+
+    for (auto i = 0; i < args_count; ++i) {
+        arguments[i] = &results[i];
+        arguments_ptrs[i] = &arguments[i];
+    }
+
+    auto lines = load_logfile();
+
+    for (auto _ : state)
+        for (auto line : lines)
+            length += check_re2(line, re, arguments_ptrs, results, args_count);
 
     state.counters["length"] = length;
 }
@@ -523,6 +614,7 @@ static void BM_Logfile_PCRE2_JIT(benchmark::State& state, const char* pattern)
 
 BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_RE2, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
@@ -530,6 +622,7 @@ BENCHMARK_CAPTURE(BM_OneLine_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecond
 
 BENCHMARK_CAPTURE(BM_OneLine_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_OneLine_RE2, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_OneLine_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
@@ -537,6 +630,7 @@ BENCHMARK_CAPTURE(BM_OneLine_PCRE2_JIT, 2, regex2)->Unit(benchmark::kMicrosecond
 
 BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_RE2, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
@@ -544,6 +638,7 @@ BENCHMARK_CAPTURE(BM_AllLines_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecon
 
 BENCHMARK_CAPTURE(BM_AllLines_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_AllLines_RE2, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_AllLines_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);
@@ -551,6 +646,7 @@ BENCHMARK_CAPTURE(BM_AllLines_PCRE2_JIT, 2, regex2)->Unit(benchmark::kMicrosecon
 
 BENCHMARK_CAPTURE(BM_Logfile_StdRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_BoostRegex, 1, regex1)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_RE2, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE_JIT, 1, regex1)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE2, 1, regex1)->Unit(benchmark::kMicrosecond);
@@ -558,6 +654,7 @@ BENCHMARK_CAPTURE(BM_Logfile_PCRE2_JIT, 1, regex1)->Unit(benchmark::kMicrosecond
 
 BENCHMARK_CAPTURE(BM_Logfile_StdRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_BoostRegex, 2, regex2)->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Logfile_RE2, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE_JIT, 2, regex2)->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Logfile_PCRE2, 2, regex2)->Unit(benchmark::kMicrosecond);

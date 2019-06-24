@@ -8,6 +8,7 @@ find_package(Boost REQUIRED COMPONENTS headers regex)
 
 include_directories("$ENV{SUITE_BUILD}/include")
 
+set(LibRE2_LIBRARY "$ENV{SUITE_BUILD}/lib/libre2.a")
 set(LibPCRE_LIBRARY "$ENV{SUITE_BUILD}/lib/libpcre.dylib")
 set(LibPCRE2_LIBRARY "$ENV{SUITE_BUILD}/lib/libpcre2-8.dylib")
 
@@ -24,7 +25,8 @@ endif()
 target_link_libraries(examples PRIVATE benchmark::benchmark)
 target_link_libraries(regex PRIVATE benchmark::benchmark
 	                                ${Boost_LIBRARIES} Boost::regex
-	                                "${LibPCRE_LIBRARY}"
+	                                "${LibRE2_LIBRARY}"
+                                    "${LibPCRE_LIBRARY}"
 	                                "${LibPCRE2_LIBRARY}")
 
 set_target_properties(examples PROPERTIES CXX_EXTENSIONS OFF)
