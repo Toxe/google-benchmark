@@ -330,7 +330,7 @@ std::tuple<pcre*, pcre_extra*> init_pcre(const char* pattern)
     if (!sd && error)
         throw std::runtime_error{"PCRE study error"};
 
-    return std::make_tuple(re, sd);
+    return {re, sd};
 }
 
 std::tuple<pcre*, pcre_extra*, pcre_jit_stack*> init_pcre_jit(const char* pattern)
@@ -355,7 +355,7 @@ std::tuple<pcre*, pcre_extra*, pcre_jit_stack*> init_pcre_jit(const char* patter
 
     pcre_assign_jit_stack(sd, nullptr, jit_stack);
 
-    return std::make_tuple(re, sd, jit_stack);
+    return {re, sd, jit_stack};
 }
 
 static void BM_OneLine_PCRE(benchmark::State& state, const char* pattern)
@@ -472,7 +472,7 @@ std::tuple<pcre2_code*, pcre2_match_data*> init_pcre2(const char* pattern)
     if (!match_data)
         throw std::runtime_error{"PCRE2 unable to create match data"};
 
-    return std::make_tuple(re, match_data);
+    return {re, match_data};
 }
 
 std::tuple<pcre2_code*, pcre2_match_context*, pcre2_jit_stack*, pcre2_match_data*> init_pcre2_jit(const char* pattern)
@@ -505,7 +505,7 @@ std::tuple<pcre2_code*, pcre2_match_context*, pcre2_jit_stack*, pcre2_match_data
     if (!match_data)
         throw std::runtime_error{"PCRE2 unable to create match data"};
 
-    return std::make_tuple(re, mcontext, jit_stack, match_data);
+    return {re, mcontext, jit_stack, match_data};
 }
 
 static void BM_OneLine_PCRE2(benchmark::State& state, const char* pattern)
