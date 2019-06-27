@@ -16,10 +16,12 @@ set(LibPCRE2_LIBRARY "$ENV{SUITE_BUILD}/lib/libpcre2-8.dylib")
 add_executable(examples examples.cpp)
 add_executable(regex regex.cpp)
 add_executable(regex_hyperscan regex_hyperscan.cpp)
+add_executable(project_euler project_euler.cpp)
 
 target_compile_features(examples PUBLIC cxx_std_17)
 target_compile_features(regex PUBLIC cxx_std_17)
 target_compile_features(regex_hyperscan PUBLIC cxx_std_17)
+target_compile_features(project_euler PUBLIC cxx_std_17)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     target_compile_options(regex PRIVATE "-fvisibility=hidden")
@@ -33,7 +35,9 @@ target_link_libraries(regex PRIVATE benchmark::benchmark
 	                                "${LibPCRE2_LIBRARY}")
 target_link_libraries(regex_hyperscan PRIVATE benchmark::benchmark
                                               "${LibHYPERSCAN_LIBRARY}")
+target_link_libraries(project_euler PRIVATE benchmark::benchmark)
 
 set_target_properties(examples PROPERTIES CXX_EXTENSIONS OFF)
 set_target_properties(regex PROPERTIES CXX_EXTENSIONS OFF)
 set_target_properties(regex_hyperscan PROPERTIES CXX_EXTENSIONS OFF)
+set_target_properties(project_euler PROPERTIES CXX_EXTENSIONS OFF)
