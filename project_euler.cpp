@@ -195,6 +195,20 @@ long long euler008(const std::string& big_number)
     return max;
 }
 
+int euler009()
+{
+    for (int a = 1; a <= (1000/3); ++a) {
+        for (int b = a + 1; b <= (999 - a) / 2; ++b) {
+            int c = 1000 - (a + b);
+
+            if ((a * a) + (b * b) == (c * c))
+                return a * b * c;
+        }
+    }
+
+    return 0;
+}
+
 static void BM_Euler001(benchmark::State& state)
 {
     for (auto _ : state)
@@ -295,6 +309,12 @@ static void BM_Euler008(benchmark::State& state)
         benchmark::DoNotOptimize(euler008(big_number));
 }
 
+static void BM_Euler009(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(euler009());
+}
+
 BENCHMARK(BM_Euler001);
 BENCHMARK(BM_Euler002);
 
@@ -358,5 +378,6 @@ BENCHMARK(BM_Euler007_NthPrime)->Arg(100);
 BENCHMARK(BM_Euler007_NthPrime)->Arg(10001);
 
 BENCHMARK(BM_Euler008);
+BENCHMARK(BM_Euler009);
 
 BENCHMARK_MAIN();
