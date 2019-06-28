@@ -67,6 +67,36 @@ bool is_palindrome_number(const T number)
     return true;
 }
 
+template <typename T>
+bool is_prime(T number)
+{
+    if (number < 2)
+        return false;
+
+    const T root = std::sqrt(number);
+
+    for (T i = 2; i <= root; ++i)
+        if (number % i == 0)
+            return false;
+
+    return true;
+}
+
+int nth_prime(int n)
+{
+    int i = 1;
+    int number = 1;
+
+    while (i <= n) {
+        ++number;
+
+        if (is_prime(number))
+            ++i;
+    }
+
+    return number;
+}
+
 int euler001()
 {
     int sum = 0;
@@ -191,6 +221,24 @@ static void BM_Euler006(benchmark::State& state)
         benchmark::DoNotOptimize(euler006());
 }
 
+static void BM_Euler007_IsPrime_Int(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(is_prime((int) state.range(0)));
+}
+
+static void BM_Euler007_IsPrime_LongLong(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(is_prime((long long) state.range(0)));
+}
+
+static void BM_Euler007_NthPrime(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(nth_prime(state.range(0)));
+}
+
 BENCHMARK(BM_Euler001);
 BENCHMARK(BM_Euler002);
 
@@ -225,5 +273,32 @@ BENCHMARK(BM_Euler004_IsPalindromeNumber_LongLong)->Arg(12345676654321);
 
 BENCHMARK(BM_Euler005);
 BENCHMARK(BM_Euler006);
+
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(2);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(8);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(11);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(47);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(49);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(251);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(4815);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(4817);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(16123);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(16127);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(1046527);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(1046529);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(16769021);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(16769023);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(27644437);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(27644439);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(84657327);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(84657329);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(479001593);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(479001597);
+BENCHMARK(BM_Euler007_IsPrime_Int)->Arg(479001599);
+BENCHMARK(BM_Euler007_IsPrime_LongLong)->Arg(999999000001);
+BENCHMARK(BM_Euler007_IsPrime_LongLong)->Arg(999999000003);
+BENCHMARK(BM_Euler007_NthPrime)->Arg(6);
+BENCHMARK(BM_Euler007_NthPrime)->Arg(100);
+BENCHMARK(BM_Euler007_NthPrime)->Arg(10001);
 
 BENCHMARK_MAIN();
