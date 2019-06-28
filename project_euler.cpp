@@ -53,6 +53,19 @@ std::vector<T> prime_factorization(const T number)
     return factors;
 }
 
+template <typename T>
+bool is_palindrome_number(const T number)
+{
+    const std::string s{std::to_string(number)};
+    auto right = s.cend() - 1;
+
+    for (auto left = s.cbegin(); left < right; ++left, --right)
+        if (*left != *right)
+            return false;
+
+    return true;
+}
+
 int euler001()
 {
     int sum = 0;
@@ -83,6 +96,23 @@ T euler003(T number)
     return factors.back();
 }
 
+int euler004()
+{
+    int max = 0;
+
+    for (int i = 999; i >= 100; --i) {
+        for (int j = i; j >= 100; --j) {
+            const int n = i * j;
+
+            if (n > max)
+                if (is_palindrome_number(n))
+                    max = n;
+        }
+    }
+
+    return max;
+}
+
 static void BM_Euler001(benchmark::State& state)
 {
     for (auto _ : state)
@@ -107,6 +137,24 @@ static void BM_Euler003_LongLong(benchmark::State& state)
         benchmark::DoNotOptimize(euler003((long long) state.range(0)));
 }
 
+static void BM_Euler004(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(euler004());
+}
+
+static void BM_Euler004_IsPalindromeNumber_Int(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(is_palindrome_number((int) state.range(0)));
+}
+
+static void BM_Euler004_IsPalindromeNumber_LongLong(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(is_palindrome_number((long long) state.range(0)));
+}
+
 BENCHMARK(BM_Euler001);
 BENCHMARK(BM_Euler002);
 
@@ -122,5 +170,21 @@ BENCHMARK(BM_Euler003_Int)->Arg(6535781);
 BENCHMARK(BM_Euler003_Int)->Arg(6535783);
 BENCHMARK(BM_Euler003_Int)->Arg(6535787);
 BENCHMARK(BM_Euler003_LongLong)->Arg(600851475143);
+
+BENCHMARK(BM_Euler004);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(3);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(30);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(33);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(300);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(303);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(330);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(333);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(9009);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(9019);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(1234221);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(1234321);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(12344321);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_LongLong)->Arg(12345677654321);
+BENCHMARK(BM_Euler004_IsPalindromeNumber_LongLong)->Arg(12345676654321);
 
 BENCHMARK_MAIN();
