@@ -124,6 +124,19 @@ int euler005()
     return n;
 }
 
+int euler006()
+{
+    int sum = 0;
+    int sum_of_squares = 0;
+
+    for (int i = 1; i <= 100; ++i) {
+        sum += i;
+        sum_of_squares += i * i;
+    }
+
+    return sum * sum - sum_of_squares;
+}
+
 static void BM_Euler001(benchmark::State& state)
 {
     for (auto _ : state)
@@ -172,6 +185,12 @@ static void BM_Euler005(benchmark::State& state)
         benchmark::DoNotOptimize(euler005());
 }
 
+static void BM_Euler006(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(euler006());
+}
+
 BENCHMARK(BM_Euler001);
 BENCHMARK(BM_Euler002);
 
@@ -205,5 +224,6 @@ BENCHMARK(BM_Euler004_IsPalindromeNumber_LongLong)->Arg(12345677654321);
 BENCHMARK(BM_Euler004_IsPalindromeNumber_LongLong)->Arg(12345676654321);
 
 BENCHMARK(BM_Euler005);
+BENCHMARK(BM_Euler006);
 
 BENCHMARK_MAIN();
