@@ -2,6 +2,7 @@
 #include <benchmark/benchmark.h>
 #include <cmath>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 class Fibonacci {
@@ -113,6 +114,16 @@ int euler004()
     return max;
 }
 
+int euler005()
+{
+    int n = 1;
+
+    for (int i = 2; i <= 20; ++i)
+        n = std::lcm(n, i);
+
+    return n;
+}
+
 static void BM_Euler001(benchmark::State& state)
 {
     for (auto _ : state)
@@ -155,6 +166,12 @@ static void BM_Euler004_IsPalindromeNumber_LongLong(benchmark::State& state)
         benchmark::DoNotOptimize(is_palindrome_number((long long) state.range(0)));
 }
 
+static void BM_Euler005(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(euler005());
+}
+
 BENCHMARK(BM_Euler001);
 BENCHMARK(BM_Euler002);
 
@@ -186,5 +203,7 @@ BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(1234321);
 BENCHMARK(BM_Euler004_IsPalindromeNumber_Int)->Arg(12344321);
 BENCHMARK(BM_Euler004_IsPalindromeNumber_LongLong)->Arg(12345677654321);
 BENCHMARK(BM_Euler004_IsPalindromeNumber_LongLong)->Arg(12345676654321);
+
+BENCHMARK(BM_Euler005);
 
 BENCHMARK_MAIN();
