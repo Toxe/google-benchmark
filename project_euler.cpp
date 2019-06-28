@@ -84,14 +84,13 @@ bool is_prime(T number)
 
 int nth_prime(int n)
 {
-    int i = 1;
     int number = 1;
 
-    while (i <= n) {
+    while (n > 0) {
         ++number;
 
         if (is_prime(number))
-            ++i;
+            --n;
     }
 
     return number;
