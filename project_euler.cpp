@@ -209,6 +209,17 @@ int euler009()
     return 0;
 }
 
+long long euler010()
+{
+    long long sum = 0;
+
+    for (int i = 1; i < 2000000; ++i)
+        if (is_prime(i))
+            sum += i;
+
+    return sum;
+}
+
 static void BM_Euler001(benchmark::State& state)
 {
     for (auto _ : state)
@@ -315,6 +326,12 @@ static void BM_Euler009(benchmark::State& state)
         benchmark::DoNotOptimize(euler009());
 }
 
+static void BM_Euler010(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(euler010());
+}
+
 BENCHMARK(BM_Euler001);
 BENCHMARK(BM_Euler002);
 
@@ -379,5 +396,6 @@ BENCHMARK(BM_Euler007_NthPrime)->Arg(10001);
 
 BENCHMARK(BM_Euler008);
 BENCHMARK(BM_Euler009);
+BENCHMARK(BM_Euler010);
 
 BENCHMARK_MAIN();
