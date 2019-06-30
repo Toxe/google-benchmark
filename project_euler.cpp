@@ -55,6 +55,18 @@ std::vector<T> prime_factorization(const T number)
 }
 
 template <typename T>
+std::vector<T> integer_factorization(const T number)
+{
+    std::vector<T> factors;
+
+    for (T i = 1; i <= number; ++i)
+        if (number % i == 0)
+            factors.push_back(i);
+
+    return factors;
+}
+
+template <typename T>
 bool is_palindrome_number(const T number)
 {
     const std::string s{std::to_string(number)};
@@ -104,6 +116,11 @@ long long calc_adjacent_digits_product(std::string::const_iterator begin, std::s
         prod *= *p - 48;
 
     return prod;
+}
+
+int nth_triangular_number(int n)
+{
+    return (n * (n + 1)) / 2;
 }
 
 int calc_grid_product(const char* p, int increment)
@@ -277,6 +294,24 @@ int euler011()
     return max;
 }
 
+int euler012(std::size_t min_factors)
+{
+    std::size_t max = 0;
+    int n = 1;
+
+    while (true) {
+        int triangular_number = nth_triangular_number(n);
+        auto factors{integer_factorization(triangular_number)};
+
+        if ((max = std::max(max, factors.size())) >= min_factors)
+            return triangular_number;
+
+        ++n;
+    }
+
+    return 0;
+}
+
 static void BM_Euler001(benchmark::State& state)
 {
     for (auto _ : state)
@@ -395,6 +430,18 @@ static void BM_Euler011(benchmark::State& state)
         benchmark::DoNotOptimize(euler011());
 }
 
+static void BM_Euler012(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(euler012(state.range(0)));
+}
+
+static void BM_Euler012_IntegerFactorization(benchmark::State& state)
+{
+    for (auto _ : state)
+        auto factors{integer_factorization((int) state.range(0))};
+}
+
 BENCHMARK(BM_Euler001);
 BENCHMARK(BM_Euler002);
 
@@ -461,5 +508,16 @@ BENCHMARK(BM_Euler008);
 BENCHMARK(BM_Euler009);
 BENCHMARK(BM_Euler010);
 BENCHMARK(BM_Euler011);
+
+BENCHMARK(BM_Euler012)->Arg(50);
+BENCHMARK(BM_Euler012)->Arg(100);
+BENCHMARK(BM_Euler012)->Arg(200);
+BENCHMARK(BM_Euler012_IntegerFactorization)->Arg(1);
+BENCHMARK(BM_Euler012_IntegerFactorization)->Arg(2);
+BENCHMARK(BM_Euler012_IntegerFactorization)->Arg(28);
+BENCHMARK(BM_Euler012_IntegerFactorization)->Arg(224);
+BENCHMARK(BM_Euler012_IntegerFactorization)->Arg(2591);
+BENCHMARK(BM_Euler012_IntegerFactorization)->Arg(25200);
+BENCHMARK(BM_Euler012_IntegerFactorization)->Arg(76576500);
 
 BENCHMARK_MAIN();
