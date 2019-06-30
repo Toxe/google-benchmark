@@ -133,6 +133,29 @@ int calc_grid_product(const char* p, int increment)
     return prod;
 }
 
+long long next_in_collatz_sequence(long long n)
+{
+    if (n <= 1)
+        return 1;
+
+    if (n % 2)
+        return 3 * n + 1;
+
+    return n / 2;
+}
+
+int calc_collatz_sequence_length(long long n)
+{
+    int sequence_length = 1;
+
+    while (n > 1) {
+        n = next_in_collatz_sequence(n);
+        ++sequence_length;
+    }
+
+    return sequence_length;
+}
+
 int euler001()
 {
     int sum = 0;
@@ -424,6 +447,23 @@ std::string euler013()
     return std::to_string(sum).substr(0, 10);
 }
 
+int euler014()
+{
+    int longest_sequence = 0;
+    int longest_sequence_number = 0;
+
+    for (int i = 1; i < 1000000; ++i) {
+        int length = calc_collatz_sequence_length(i);
+
+        if (length > longest_sequence) {
+            longest_sequence = length;
+            longest_sequence_number = i;
+        }
+    }
+
+    return longest_sequence_number;
+}
+
 static void BM_Euler001(benchmark::State& state)
 {
     for (auto _ : state)
@@ -560,6 +600,12 @@ static void BM_Euler013(benchmark::State& state)
         benchmark::DoNotOptimize(euler013());
 }
 
+static void BM_Euler014(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(euler014());
+}
+
 BENCHMARK(BM_Euler001);
 BENCHMARK(BM_Euler002);
 
@@ -639,5 +685,6 @@ BENCHMARK(BM_Euler012_IntegerFactorization)->Arg(25200);
 BENCHMARK(BM_Euler012_IntegerFactorization)->Arg(76576500);
 
 BENCHMARK(BM_Euler013);
+BENCHMARK(BM_Euler014);
 
 BENCHMARK_MAIN();
