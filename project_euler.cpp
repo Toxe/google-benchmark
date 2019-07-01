@@ -486,6 +486,31 @@ long long euler015(int grid_size)
     return grid[0];
 }
 
+int euler016(int exp)
+{
+    std::vector<char> digits{1};
+
+    for (int i = 0; i < exp; ++i) {
+        char carry_over = 0;
+
+        for (auto& n : digits) {
+            n = 2 * n + carry_over;
+
+            if (n >= 10) {
+                n -= 10;
+                carry_over = 1;
+            } else {
+                carry_over = 0;
+            }
+        }
+
+        if (carry_over > 0)
+            digits.push_back(carry_over);
+    }
+
+    return std::accumulate(digits.begin(), digits.end(), 0);
+}
+
 static void BM_Euler001(benchmark::State& state)
 {
     for (auto _ : state)
@@ -634,6 +659,12 @@ static void BM_Euler015(benchmark::State& state)
         benchmark::DoNotOptimize(euler015(state.range(0)));
 }
 
+static void BM_Euler016(benchmark::State& state)
+{
+    for (auto _ : state)
+        benchmark::DoNotOptimize(euler016(state.range(0)));
+}
+
 BENCHMARK(BM_Euler001);
 BENCHMARK(BM_Euler002);
 
@@ -718,5 +749,9 @@ BENCHMARK(BM_Euler014);
 BENCHMARK(BM_Euler015)->Arg(2);
 BENCHMARK(BM_Euler015)->Arg(10);
 BENCHMARK(BM_Euler015)->Arg(20);
+
+BENCHMARK(BM_Euler016)->Arg(15);
+BENCHMARK(BM_Euler016)->Arg(64);
+BENCHMARK(BM_Euler016)->Arg(1000);
 
 BENCHMARK_MAIN();
