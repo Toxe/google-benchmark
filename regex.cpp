@@ -35,8 +35,8 @@ std::size_t check_std_regex(const std::string& line, const std::regex& re, std::
 
     if (std::regex_match(line, m, re))
         if (m.size() > 1)
-            for (int i = 1; i < m.size(); ++i)
-                length += m[i].length();
+            for (int i = 1; i < static_cast<int>(m.size()); ++i)
+                length += static_cast<std::size_t>(m[static_cast<std::size_t>(i)].length());
 
     return length;
 }
@@ -47,18 +47,18 @@ std::size_t check_boost_regex(const std::string& line, const boost::regex& re, b
 
     if (boost::regex_match(line, m, re))
         if (m.size() > 1)
-            for (int i = 1; i < m.size(); ++i)
-                length += m[i].length();
+            for (int i = 1; i < static_cast<int>(m.size()); ++i)
+                length += static_cast<std::size_t>(m[i].length());
 
     return length;
 }
 
-std::size_t check_re2(const std::string& line, const re2::RE2& re, const std::vector<RE2::Arg*>& arguments_ptrs, const std::vector<std::string>& results, int args_count)
+std::size_t check_re2(const std::string& line, const re2::RE2& re, const std::vector<RE2::Arg*>& arguments_ptrs, const std::vector<std::string>& results, std::size_t args_count)
 {
     std::size_t length = 0;
 
-    if (RE2::FullMatchN(line, re, arguments_ptrs.data(), args_count))
-        for (auto i = 0; i < args_count; ++i)
+    if (RE2::FullMatchN(line, re, arguments_ptrs.data(), static_cast<int>(args_count)))
+        for (std::size_t i = 0; i < args_count; ++i)
             length += results[i].length();
 
     return length;
@@ -69,13 +69,13 @@ std::size_t check_pcre(const std::string& line, const pcre* re, const pcre_extra
     std::size_t length = 0;
     int ovector[OVECCOUNT];
 
-    const int rc = pcre_exec(re, sd, line.c_str(), line.size(), 0, 0, ovector, OVECCOUNT);
+    const int rc = pcre_exec(re, sd, line.c_str(), static_cast<int>(line.size()), 0, 0, ovector, OVECCOUNT);
 
     if (rc > 1) {
         for (int i = 1; i < rc; ++i) {
             const char* substring_start = line.c_str() + ovector[2*i];
             const int substring_length = ovector[2*i + 1] - ovector[2*i];
-            const std::string_view s{substring_start, (std::size_t) substring_length};
+            const std::string_view s{substring_start, static_cast<std::string_view::size_type>(substring_length)};
             length += s.size();
         }
     }
@@ -88,13 +88,13 @@ std::size_t check_pcre_jit(const std::string& line, const pcre* re, const pcre_e
     std::size_t length = 0;
     int ovector[OVECCOUNT];
 
-    const int rc = pcre_jit_exec(re, sd, line.c_str(), line.size(), 0, 0, ovector, OVECCOUNT, jit_stack);
+    const int rc = pcre_jit_exec(re, sd, line.c_str(), static_cast<int>(line.size()), 0, 0, ovector, OVECCOUNT, jit_stack);
 
     if (rc > 1) {
         for (int i = 1; i < rc; ++i) {
             const char* substring_start = line.c_str() + ovector[2*i];
             const int substring_length = ovector[2*i + 1] - ovector[2*i];
-            const std::string_view s{substring_start, (std::size_t) substring_length};
+            const std::string_view s{substring_start, static_cast<std::string_view::size_type>(substring_length)};
             length += s.size();
         }
     }
@@ -105,7 +105,7 @@ std::size_t check_pcre_jit(const std::string& line, const pcre* re, const pcre_e
 std::size_t check_pcre2(const std::string& line, const pcre2_code* re, pcre2_match_data* match_data)
 {
     std::size_t length = 0;
-    const PCRE2_SPTR subject = (PCRE2_SPTR) line.c_str();
+    const PCRE2_SPTR subject = reinterpret_cast<PCRE2_SPTR>(line.c_str());
 
     const int rc = pcre2_match(re, subject, line.size(), 0, 0, match_data, nullptr);
 
@@ -114,8 +114,8 @@ std::size_t check_pcre2(const std::string& line, const pcre2_code* re, pcre2_mat
 
         for (int i = 1; i < rc; ++i) {
             const PCRE2_SPTR substring_start = subject + ovector[2*i];
-            const int substring_length = ovector[2*i + 1] - ovector[2*i];
-            const std::string_view s{(const char*) substring_start, (std::size_t) substring_length};
+            const int substring_length = static_cast<int>(ovector[2*i + 1] - ovector[2*i]);
+            const std::string_view s{reinterpret_cast<const char*>(substring_start), static_cast<std::string_view::size_type>(substring_length)};
             length += s.size();
         }
     }
@@ -126,7 +126,7 @@ std::size_t check_pcre2(const std::string& line, const pcre2_code* re, pcre2_mat
 std::size_t check_pcre2_jit(const std::string& line, const pcre2_code* re, pcre2_match_data* match_data, pcre2_match_context* mcontext)
 {
     std::size_t length = 0;
-    const PCRE2_SPTR subject = (PCRE2_SPTR) line.c_str();
+    const PCRE2_SPTR subject = reinterpret_cast<PCRE2_SPTR>(line.c_str());
 
     const int rc = pcre2_jit_match(re, subject, line.size(), 0, 0, match_data, mcontext);
 
@@ -135,8 +135,8 @@ std::size_t check_pcre2_jit(const std::string& line, const pcre2_code* re, pcre2
 
         for (int i = 1; i < rc; ++i) {
             const PCRE2_SPTR substring_start = subject + ovector[2*i];
-            const int substring_length = ovector[2*i + 1] - ovector[2*i];
-            const std::string_view s{(const char*) substring_start, (std::size_t) substring_length};
+            const int substring_length = static_cast<int>(ovector[2*i + 1] - ovector[2*i]);
+            const std::string_view s{reinterpret_cast<const char*>(substring_start), static_cast<std::string_view::size_type>(substring_length)};
             length += s.size();
         }
     }
@@ -244,13 +244,13 @@ static void BM_OneLine_RE2(benchmark::State& state, const char* pattern)
     if (!re.ok())
         throw std::runtime_error{"RE2 compilation error"};
 
-    int args_count = re.NumberOfCapturingGroups();
+    std::size_t args_count = static_cast<std::size_t>(re.NumberOfCapturingGroups());
 
     std::vector<RE2::Arg> arguments(args_count);
     std::vector<RE2::Arg*> arguments_ptrs(args_count);
     std::vector<std::string> results(args_count);
 
-    for (auto i = 0; i < args_count; ++i) {
+    for (std::size_t i = 0; i < args_count; ++i) {
         arguments[i] = &results[i];
         arguments_ptrs[i] = &arguments[i];
     }
@@ -269,13 +269,13 @@ static void BM_AllLines_RE2(benchmark::State& state, const char* pattern)
     if (!re.ok())
         throw std::runtime_error{"RE2 compilation error"};
 
-    int args_count = re.NumberOfCapturingGroups();
+    std::size_t args_count = static_cast<std::size_t>(re.NumberOfCapturingGroups());
 
     std::vector<RE2::Arg> arguments(args_count);
     std::vector<RE2::Arg*> arguments_ptrs(args_count);
     std::vector<std::string> results(args_count);
 
-    for (auto i = 0; i < args_count; ++i) {
+    for (std::size_t i = 0; i < args_count; ++i) {
         arguments[i] = &results[i];
         arguments_ptrs[i] = &arguments[i];
     }
@@ -295,13 +295,13 @@ static void BM_Logfile_RE2(benchmark::State& state, const char* pattern)
     if (!re.ok())
         throw std::runtime_error{"RE2 compilation error"};
 
-    int args_count = re.NumberOfCapturingGroups();
+    std::size_t args_count = static_cast<std::size_t>(re.NumberOfCapturingGroups());
 
     std::vector<RE2::Arg> arguments(args_count);
     std::vector<RE2::Arg*> arguments_ptrs(args_count);
     std::vector<std::string> results(args_count);
 
-    for (auto i = 0; i < args_count; ++i) {
+    for (std::size_t i = 0; i < args_count; ++i) {
         arguments[i] = &results[i];
         arguments_ptrs[i] = &arguments[i];
     }
@@ -462,7 +462,7 @@ std::tuple<pcre2_code*, pcre2_match_data*> init_pcre2(const char* pattern)
     int errorcode;
     PCRE2_SIZE erroroffset;
 
-    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
+    pcre2_code* re = pcre2_compile(reinterpret_cast<PCRE2_SPTR>(pattern), PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
 
     if (!re)
         throw std::runtime_error{"PCRE2 compilation failed"};
@@ -480,7 +480,7 @@ std::tuple<pcre2_code*, pcre2_match_context*, pcre2_jit_stack*, pcre2_match_data
     int errorcode;
     PCRE2_SIZE erroroffset;
 
-    pcre2_code* re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
+    pcre2_code* re = pcre2_compile(reinterpret_cast<PCRE2_SPTR>(pattern), PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, nullptr);
 
     if (!re)
         throw std::runtime_error{"PCRE2 compilation failed"};

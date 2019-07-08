@@ -577,13 +577,13 @@ static void BM_Euler002(benchmark::State& state)
 static void BM_Euler003_Int(benchmark::State& state)
 {
     for (auto _ : state)
-        benchmark::DoNotOptimize(euler003((int) state.range(0)));
+        benchmark::DoNotOptimize(euler003(static_cast<int>(state.range(0))));
 }
 
 static void BM_Euler003_LongLong(benchmark::State& state)
 {
     for (auto _ : state)
-        benchmark::DoNotOptimize(euler003((long long) state.range(0)));
+        benchmark::DoNotOptimize(euler003(static_cast<long long>(state.range(0))));
 }
 
 static void BM_Euler004(benchmark::State& state)
@@ -595,13 +595,13 @@ static void BM_Euler004(benchmark::State& state)
 static void BM_Euler004_IsPalindromeNumber_Int(benchmark::State& state)
 {
     for (auto _ : state)
-        benchmark::DoNotOptimize(is_palindrome_number((int) state.range(0)));
+        benchmark::DoNotOptimize(is_palindrome_number(static_cast<int>(state.range(0))));
 }
 
 static void BM_Euler004_IsPalindromeNumber_LongLong(benchmark::State& state)
 {
     for (auto _ : state)
-        benchmark::DoNotOptimize(is_palindrome_number((long long) state.range(0)));
+        benchmark::DoNotOptimize(is_palindrome_number(static_cast<long long>(state.range(0))));
 }
 
 static void BM_Euler005(benchmark::State& state)
@@ -619,19 +619,19 @@ static void BM_Euler006(benchmark::State& state)
 static void BM_Euler007_IsPrime_Int(benchmark::State& state)
 {
     for (auto _ : state)
-        benchmark::DoNotOptimize(is_prime((int) state.range(0)));
+        benchmark::DoNotOptimize(is_prime(static_cast<int>(state.range(0))));
 }
 
 static void BM_Euler007_IsPrime_LongLong(benchmark::State& state)
 {
     for (auto _ : state)
-        benchmark::DoNotOptimize(is_prime((long long) state.range(0)));
+        benchmark::DoNotOptimize(is_prime(static_cast<long long>(state.range(0))));
 }
 
 static void BM_Euler007_NthPrime(benchmark::State& state)
 {
     for (auto _ : state)
-        benchmark::DoNotOptimize(nth_prime(state.range(0)));
+        benchmark::DoNotOptimize(nth_prime(static_cast<int>(state.range(0))));
 }
 
 static void BM_Euler008(benchmark::State& state)
@@ -683,13 +683,13 @@ static void BM_Euler011(benchmark::State& state)
 static void BM_Euler012(benchmark::State& state)
 {
     for (auto _ : state)
-        benchmark::DoNotOptimize(euler012(state.range(0)));
+        benchmark::DoNotOptimize(euler012(static_cast<std::size_t>(state.range(0))));
 }
 
 static void BM_Euler012_IntegerFactorization(benchmark::State& state)
 {
     for (auto _ : state)
-        auto factors{integer_factorization((int) state.range(0))};
+        auto factors{integer_factorization(static_cast<int>(state.range(0)))};
 }
 
 static void BM_Euler013(benchmark::State& state)
@@ -707,13 +707,13 @@ static void BM_Euler014(benchmark::State& state)
 static void BM_Euler015(benchmark::State& state)
 {
     for (auto _ : state)
-        benchmark::DoNotOptimize(euler015(state.range(0)));
+        benchmark::DoNotOptimize(euler015(static_cast<int>(state.range(0))));
 }
 
 static void BM_Euler016(benchmark::State& state)
 {
     for (auto _ : state)
-        benchmark::DoNotOptimize(euler016(state.range(0)));
+        benchmark::DoNotOptimize(euler016(static_cast<int>(state.range(0))));
 }
 
 static void BM_Euler018(benchmark::State& state)

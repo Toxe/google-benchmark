@@ -21,9 +21,9 @@ const std::vector<std::string> all_lines{
 const char* regex1 = R"(\[(.+) \| ([^\]]+)\] \((.+, )?(\d+)\) (.+) \[(.+)\] RQST END   \[(.+)\] *(\d+) ms)";
 const char* regex2 = R"(\[([^ ]{8}) \| ([^\]]{19})\] \((?:[^,]+, )?\d+\) [^ ]+ \[([^\]]+)\] RQST END   \[[^\]]+\] *(\d+) ms)";
 
-static int match_found_handler(unsigned int id, unsigned long long from, unsigned long long to, unsigned int flags, void* ctx)
+static int match_found_handler(unsigned int, unsigned long long from, unsigned long long to, unsigned int, void* ctx)
 {
-    std::size_t* p = (std::size_t*) ctx;
+    std::size_t* p = static_cast<std::size_t*>(ctx);
     *p = (to - from);
     return 0;
 }
@@ -32,7 +32,7 @@ std::size_t check_hyperscan(const std::string& line, const hs_database_t* databa
 {
     std::size_t length = 0;
 
-    if (hs_scan(database, line.c_str(), line.length(), 0, scratch, match_found_handler, &length) != HS_SUCCESS)
+    if (hs_scan(database, line.c_str(), static_cast<unsigned int>(line.length()), 0, scratch, match_found_handler, &length) != HS_SUCCESS)
         throw std::runtime_error{"Hyperscan scan error"};
 
     return length;

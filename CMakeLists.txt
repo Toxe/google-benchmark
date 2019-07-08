@@ -23,6 +23,11 @@ target_compile_features(regex PUBLIC cxx_std_17)
 target_compile_features(regex_hyperscan PUBLIC cxx_std_17)
 target_compile_features(project_euler PUBLIC cxx_std_17)
 
+target_compile_options(examples PRIVATE -Wall -Wextra -Wmost -pedantic -Wfloat-equal -Wold-style-cast)
+target_compile_options(regex PRIVATE -Wall -Wextra -Wmost -pedantic -Wconversion -Wfloat-equal -Wold-style-cast)
+target_compile_options(regex_hyperscan PRIVATE -Wall -Wextra -Wmost -pedantic -Wconversion -Wfloat-equal -Wold-style-cast)
+target_compile_options(project_euler PRIVATE -Wall -Wextra -Wmost -pedantic -Wconversion -Wfloat-equal -Wold-style-cast)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     target_compile_options(regex PRIVATE "-fvisibility=hidden")
 endif()
