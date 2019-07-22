@@ -3,51 +3,40 @@ project("Google Benchmark" LANGUAGES CXX)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-find_package(benchmark)
-find_package(Boost REQUIRED COMPONENTS headers regex)
+find_package(benchmark CONFIG REQUIRED)
+find_package(Boost REQUIRED COMPONENTS regex)
+find_package(re2 CONFIG REQUIRED)
 
-include_directories("$ENV{SUITE_BUILD}/include")
+find_library(Hyperscan_LIBRARY hs)
+find_library(PCRE_LIBRARY pcre)
+find_library(PCRE2_LIBRARY pcre2-8)
 
-set(LibRE2_LIBRARY "$ENV{SUITE_BUILD}/lib/libre2.a")
-set(LibHYPERSCAN_LIBRARY "$ENV{SUITE_BUILD}/lib/libhs.dylib")
-set(LibPCRE_LIBRARY "$ENV{SUITE_BUILD}/lib/libpcre.dylib")
-set(LibPCRE2_LIBRARY "$ENV{SUITE_BUILD}/lib/libpcre2-8.dylib")
+find_path(Hyperscan_INCLUDE_DIRS hs/hs.h)
+find_path(PCRE_INCLUDE_DIRS pcre.h)
+find_path(PCRE2_INCLUDE_DIRS pcre2.h)
 
-add_executable(examples examples.cpp)
-add_executable(regex regex.cpp)
-add_executable(regex_hyperscan regex_hyperscan.cpp)
-add_executable(project_euler project_euler.cpp)
-add_executable(mandelbrot mandelbrot.cpp)
+set(ALL_TARGETS
+    examples
+    regex
+    regex_hyperscan
+    project_euler
+    mandelbrot
+)
 
-target_compile_features(examples PUBLIC cxx_std_17)
-target_compile_features(regex PUBLIC cxx_std_17)
-target_compile_features(regex_hyperscan PUBLIC cxx_std_17)
-target_compile_features(project_euler PUBLIC cxx_std_17)
-target_compile_features(mandelbrot PUBLIC cxx_std_17)
+foreach(target ${ALL_TARGETS})
+    add_executable(${target} ${target}.cpp)
+    target_compile_features(${target} PUBLIC cxx_std_17)
+    target_compile_options(${target} PRIVATE -Wall -Wextra -Wmost -pedantic -Wconversion -Wfloat-equal -Wold-style-cast -fcolor-diagnostics)
+    set_target_properties(${target} PROPERTIES CXX_EXTENSIONS OFF)
+endforeach()
 
-target_compile_options(examples PRIVATE -Wall -Wextra -Wmost -pedantic -Wfloat-equal -Wold-style-cast)
-target_compile_options(regex PRIVATE -Wall -Wextra -Wmost -pedantic -Wconversion -Wfloat-equal -Wold-style-cast)
-target_compile_options(regex_hyperscan PRIVATE -Wall -Wextra -Wmost -pedantic -Wconversion -Wfloat-equal -Wold-style-cast)
-target_compile_options(project_euler PRIVATE -Wall -Wextra -Wmost -pedantic -Wconversion -Wfloat-equal -Wold-style-cast)
-target_compile_options(mandelbrot PRIVATE -Wall -Wextra -Wmost -pedantic -Wconversion -Wfloat-equal -Wold-style-cast)
+target_compile_options(examples PRIVATE -Wno-sign-conversion)
+target_compile_options(regex PRIVATE -Wno-conversion -Wno-old-style-cast)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_options(regex PRIVATE "-fvisibility=hidden")
-endif()
+target_include_directories(regex_hyperscan PRIVATE ${Hyperscan_INCLUDE_DIRS})
 
 target_link_libraries(examples PRIVATE benchmark::benchmark)
-target_link_libraries(regex PRIVATE benchmark::benchmark
-	                                ${Boost_LIBRARIES} Boost::regex
-	                                "${LibRE2_LIBRARY}"
-                                    "${LibPCRE_LIBRARY}"
-	                                "${LibPCRE2_LIBRARY}")
-target_link_libraries(regex_hyperscan PRIVATE benchmark::benchmark
-                                              "${LibHYPERSCAN_LIBRARY}")
+target_link_libraries(regex PRIVATE benchmark::benchmark ${Boost_LIBRARIES} re2::re2 "${PCRE_LIBRARY}" "${PCRE2_LIBRARY}")
+target_link_libraries(regex_hyperscan PRIVATE benchmark::benchmark "${Hyperscan_LIBRARY}")
 target_link_libraries(project_euler PRIVATE benchmark::benchmark)
 target_link_libraries(mandelbrot PRIVATE benchmark::benchmark)
-
-set_target_properties(examples PROPERTIES CXX_EXTENSIONS OFF)
-set_target_properties(regex PROPERTIES CXX_EXTENSIONS OFF)
-set_target_properties(regex_hyperscan PROPERTIES CXX_EXTENSIONS OFF)
-set_target_properties(project_euler PROPERTIES CXX_EXTENSIONS OFF)
-set_target_properties(mandelbrot PROPERTIES CXX_EXTENSIONS OFF)
