@@ -24,7 +24,7 @@ const char* regex2 = R"(\[([^ ]{8}) \| ([^\]]{19})\] \((?:[^,]+, )?\d+\) [^ ]+ \
 static int match_found_handler(unsigned int, unsigned long long from, unsigned long long to, unsigned int, void* ctx)
 {
     std::size_t* p = static_cast<std::size_t*>(ctx);
-    *p = (to - from);
+    *p = static_cast<std::size_t>(to - from);
     return 0;
 }
 

@@ -37,7 +37,7 @@ std::vector<T> prime_factorization(const T number)
     std::vector<T> factors;
     T n = number;
     T f = 2;
-    const T root = static_cast<T>(std::sqrtf(n));
+    const T root = static_cast<T>(std::sqrtf(static_cast<float>(n)));
 
     while (n > 1) {
         if (n % f == 0) {
@@ -167,7 +167,7 @@ void euler018_update_row_values(const int num_values_in_current_row,
         const auto prev_row_left_value = (col > 0) ? *prev_left : 0;
         const auto prev_row_right_value = (col < num_values_in_current_row - 1) ? *prev_right : 0;
 
-        *(begin_of_current_row + col) += std::max(prev_row_left_value, prev_row_right_value);
+        *(begin_of_current_row + col) += static_cast<short>(std::max(prev_row_left_value, prev_row_right_value));
     }
 }
 

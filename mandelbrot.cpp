@@ -880,7 +880,7 @@ void mandelbrot_colorize_v8(const int max_iterations, const Gradient_v2& gradien
 {
     // Sum all iterations, not counting the last one at position histogram[max_iterations] (which
     // are points in the Mandelbrot Set).
-    const float total_iterations = std::accumulate(std::next(histogram.cbegin()), std::prev(histogram.cend()), 0);
+    const float total_iterations = static_cast<float>(std::accumulate(std::next(histogram.cbegin()), std::prev(histogram.cend()), 0));
 
     // Normalize the colors (0.0 .. 1.0) based on how often they are used in the image, not counting
     // histogram[max_iterations] (which are points in the Mandelbrot Set).
