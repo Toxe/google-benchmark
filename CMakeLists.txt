@@ -46,6 +46,8 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options(examples PRIVATE /wd4244)
+    target_compile_options(regex PRIVATE /wd4244)
+    target_compile_options(regex_hyperscan PRIVATE /wd4244)
 endif()
 
 target_include_directories(regex_hyperscan PRIVATE ${Hyperscan_INCLUDE_DIRS})
