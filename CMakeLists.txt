@@ -21,6 +21,7 @@ set(ALL_TARGETS
     regex_hyperscan
     project_euler
     mandelbrot
+    maze_generator
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
