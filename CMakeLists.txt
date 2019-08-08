@@ -31,6 +31,7 @@ foreach(target ${ALL_TARGETS})
     add_executable(${target} ${target}.cpp)
     target_compile_features(${target} PUBLIC cxx_std_17)
     set_target_properties(${target} PROPERTIES CXX_EXTENSIONS OFF)
+    target_link_libraries(${target} PRIVATE benchmark::benchmark)
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(${target} PRIVATE -Wall -Wextra -Wmost -pedantic -Wconversion -Wfloat-equal -Wold-style-cast -fcolor-diagnostics)
@@ -52,8 +53,5 @@ endif()
 
 target_include_directories(regex_hyperscan PRIVATE ${Hyperscan_INCLUDE_DIRS})
 
-target_link_libraries(examples PRIVATE benchmark::benchmark)
-target_link_libraries(regex PRIVATE benchmark::benchmark ${Boost_LIBRARIES} re2::re2 "${PCRE_LIBRARY}" "${PCRE2_LIBRARY}")
-target_link_libraries(regex_hyperscan PRIVATE benchmark::benchmark "${Hyperscan_LIBRARY}")
-target_link_libraries(project_euler PRIVATE benchmark::benchmark)
-target_link_libraries(mandelbrot PRIVATE benchmark::benchmark)
+target_link_libraries(regex PRIVATE ${Boost_LIBRARIES} re2::re2 "${PCRE_LIBRARY}" "${PCRE2_LIBRARY}")
+target_link_libraries(regex_hyperscan PRIVATE "${Hyperscan_LIBRARY}")
