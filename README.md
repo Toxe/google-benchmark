@@ -9,3 +9,9 @@
 - PCRE2 + JIT
 - Google re2
 - Intel Hyperscan
+
+### Vcpkg
+
+Install Vcpkg dependencies with:
+
+    $ vcpkg install $(< .vcpkg)
