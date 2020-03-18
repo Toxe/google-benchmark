@@ -32,12 +32,12 @@ enum class WallFlags_v3 {
 
 class Maze_v2 {
 public:
-    Maze_v2(const int width, const int height) : width_{width}, height_{height}, nodes_(width * height) {}
+    Maze_v2(const int width, const int height) : width_{width}, height_{height}, nodes_(static_cast<std::size_t>(width * height)) {}
 
     int width() const { return width_; }
     int height() const { return height_; }
 
-    Node_v1* node(const Coordinates_v2 coords) { return &nodes_[coords.y * width_ + coords.x]; }
+    Node_v1* node(const Coordinates_v2 coords) { return &nodes_[static_cast<std::size_t>(coords.y * width_ + coords.x)]; }
     bool valid_coords(const Coordinates_v2 coords) const { return coords.x >= 0 && coords.y >= 0 && coords.x < width_ && coords.y < height_; }
 
 private:
@@ -51,21 +51,21 @@ public:
     Maze_v3(const int width, const int height)
         : width_{width},
           height_{height},
-          nodes_(width * height, static_cast<unsigned char>(WallFlags_v3::North) | static_cast<unsigned char>(WallFlags_v3::East) | static_cast<unsigned char>(WallFlags_v3::South) | static_cast<unsigned char>(WallFlags_v3::West)) {}
+          nodes_(static_cast<std::size_t>(width * height), static_cast<unsigned char>(WallFlags_v3::North) | static_cast<unsigned char>(WallFlags_v3::East) | static_cast<unsigned char>(WallFlags_v3::South) | static_cast<unsigned char>(WallFlags_v3::West)) {}
 
     int width() const { return width_; }
     int height() const { return height_; }
 
     bool valid_coords(const Coordinates_v2 coords) const { return coords.x >= 0 && coords.y >= 0 && coords.x < width_ && coords.y < height_; }
 
-    bool node_visited(const Coordinates_v2 coords) const { return nodes_[coords.y * width_ + coords.x] & 0b10000; }
-    void set_node_visited(const Coordinates_v2 coords) { nodes_[coords.y * width_ + coords.x] |= 0b10000; }
+    bool node_visited(const Coordinates_v2 coords) const { return nodes_[static_cast<std::size_t>(coords.y * width_ + coords.x)] & 0b10000; }
+    void set_node_visited(const Coordinates_v2 coords) { nodes_[static_cast<std::size_t>(coords.y * width_ + coords.x)] |= 0b10000; }
 
-    bool has_wall(const Coordinates_v2 coords, WallFlags_v3 wall) const { return nodes_[coords.y * width_ + coords.x] & static_cast<unsigned char>(wall); }
+    bool has_wall(const Coordinates_v2 coords, WallFlags_v3 wall) const { return nodes_[static_cast<std::size_t>(coords.y * width_ + coords.x)] & static_cast<unsigned char>(wall); }
 
     void clear_walls(const Coordinates_v2 orig, const Coordinates_v2 dest, WallFlags_v3 orig_wall, WallFlags_v3 dest_wall) {
-        nodes_[orig.y * width_ + orig.x] &= ~(static_cast<unsigned char>(orig_wall));
-        nodes_[dest.y * width_ + dest.x] &= ~(static_cast<unsigned char>(dest_wall));
+        nodes_[static_cast<std::size_t>(orig.y * width_ + orig.x)] &= ~(static_cast<unsigned char>(orig_wall));
+        nodes_[static_cast<std::size_t>(dest.y * width_ + dest.x)] &= ~(static_cast<unsigned char>(dest_wall));
     }
 
 private:
@@ -99,7 +99,7 @@ public:
     Maze_v4(const int width, const int height)
         : width_{width},
           height_{height},
-          nodes_(width * height, static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)) {}
+          nodes_(static_cast<std::size_t>(width * height), static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)) {}
 
     int width() const { return width_; }
     int height() const { return height_; }
@@ -111,7 +111,7 @@ public:
         return Coordinates{coords.x + offset.x, coords.y + offset.y};
     }
 
-    Node& node(const Coordinates coords) { return nodes_[coords.y * width_ + coords.x]; };
+    Node& node(const Coordinates coords) { return nodes_[static_cast<std::size_t>(coords.y * width_ + coords.x)]; };
     bool node_visited(const Coordinates coords) { return node(coords) & 0b10000; }
     void set_node_visited(const Coordinates coords) { node(coords) |= 0b10000; }
 
@@ -159,7 +159,7 @@ public:
     Maze_v5(const int width, const int height)
         : width_{width},
           height_{height},
-          nodes_(width * height, static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)),
+          nodes_(static_cast<std::size_t>(width * height), static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)),
           random_device_(),
           random_generator_(random_device_()) {}
 
@@ -173,7 +173,7 @@ public:
         return Coordinates{coords.x + offset.x, coords.y + offset.y};
     }
 
-    Node& node(const Coordinates coords) { return nodes_[coords.y * width_ + coords.x]; };
+    Node& node(const Coordinates coords) { return nodes_[static_cast<std::size_t>(coords.y * width_ + coords.x)]; };
     bool node_visited(const Coordinates coords) { return node(coords) & 0b10000; }
     void set_node_visited(const Coordinates coords) { node(coords) |= 0b10000; }
 
@@ -230,7 +230,7 @@ public:
     Maze_v6(const int width, const int height)
         : width_{width},
           height_{height},
-          nodes_(width * height, static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)),
+          nodes_(static_cast<std::size_t>(width * height), static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)),
           random_device_(),
           random_generator_(random_device_()),
           random_dist_{0, 23} {}
@@ -245,9 +245,9 @@ public:
         return Coordinates{coords.x + offset.x, coords.y + offset.y};
     }
 
-    const std::vector<Directions>& random_directions() { return all_possible_random_directions[random_dist_(random_generator_)]; }
+    const std::vector<Directions>& random_directions() { return all_possible_random_directions[static_cast<std::size_t>(random_dist_(random_generator_))]; }
 
-    Node& node(const Coordinates coords) { return nodes_[coords.y * width_ + coords.x]; };
+    Node& node(const Coordinates coords) { return nodes_[static_cast<std::size_t>(coords.y * width_ + coords.x)]; };
     bool node_visited(const Coordinates coords) { return node(coords) & 0b10000; }
     void set_node_visited(const Coordinates coords) { node(coords) |= 0b10000; }
 
@@ -310,7 +310,7 @@ public:
     Maze_v7(const int width, const int height)
         : width_{width},
           height_{height},
-          nodes_(width * height, static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)),
+          nodes_(static_cast<std::size_t>(width * height), static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)),
           random_device_(),
           random_generator_(random_device_()),
           random_dist_{0, 23} {}
@@ -325,9 +325,9 @@ public:
         return Coordinates{coords.x + offset.x, coords.y + offset.y};
     }
 
-    const std::vector<Directions>& random_directions() { return all_possible_random_directions[random_dist_(random_generator_)]; }
+    const std::vector<Directions>& random_directions() { return all_possible_random_directions[static_cast<std::size_t>(random_dist_(random_generator_))]; }
 
-    Node& node(const Coordinates coords) { return nodes_[coords.y * width_ + coords.x]; };
+    Node& node(const Coordinates coords) { return nodes_[static_cast<std::size_t>(coords.y * width_ + coords.x)]; };
     bool node_visited(const Coordinates coords) { return node(coords) & 0b10000; }
     void set_node_visited(const Coordinates coords) { node(coords) |= 0b10000; }
 
@@ -390,7 +390,7 @@ public:
     Maze_v8(const int width, const int height)
         : width_{width},
           height_{height},
-          nodes_(width * height, static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)),
+          nodes_(static_cast<std::size_t>(width * height), static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)),
           random_device_(),
           random_generator_(random_device_()),
           random_dist_{0, 23} {}
@@ -405,9 +405,9 @@ public:
         return Coordinates{coords.x + offset.x, coords.y + offset.y};
     }
 
-    const std::vector<Directions>* random_directions() { return &all_possible_random_directions[random_dist_(random_generator_)]; }
+    const std::vector<Directions>* random_directions() { return &all_possible_random_directions[static_cast<std::size_t>(random_dist_(random_generator_))]; }
 
-    Node& node(const Coordinates coords) { return nodes_[coords.y * width_ + coords.x]; };
+    Node& node(const Coordinates coords) { return nodes_[static_cast<std::size_t>(coords.y * width_ + coords.x)]; };
     bool node_visited(const Coordinates coords) { return node(coords) & 0b10000; }
     void set_node_visited(const Coordinates coords) { node(coords) |= 0b10000; }
 
@@ -470,7 +470,7 @@ public:
     Maze_v9(const int width, const int height)
         : width_{width},
           height_{height},
-          nodes_(width * height, static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)),
+          nodes_(static_cast<std::size_t>(width * height), static_cast<Node>(WallFlags::North) | static_cast<Node>(WallFlags::East) | static_cast<Node>(WallFlags::South) | static_cast<Node>(WallFlags::West)),
           random_device_(),
           random_generator_(random_device_()),
           random_dist_{0, 23} {}
@@ -487,7 +487,7 @@ public:
 
     const Directions* random_directions() { return all_possible_random_directions[random_dist_(random_generator_)]; }
 
-    Node& node(const Coordinates coords) { return nodes_[coords.y * width_ + coords.x]; };
+    Node& node(const Coordinates coords) { return nodes_[static_cast<std::size_t>(coords.y * width_ + coords.x)]; };
     bool node_visited(const Coordinates coords) { return node(coords) & 0b10000; }
     void set_node_visited(const Coordinates coords) { node(coords) |= 0b10000; }
 
@@ -906,7 +906,7 @@ void generate_v3(Maze_v8& maze, const Maze_v8::Coordinates starting_point)
             bool keep_checking = true;
 
             while (keep_checking && current_node.rnd_idx < 4) {
-                const auto dir = current_node.check_directions->at(current_node.rnd_idx);
+                const auto dir = current_node.check_directions->at(static_cast<std::size_t>(current_node.rnd_idx));
                 ++current_node.rnd_idx;
 
                 Maze_v8::Coordinates next_coords{maze.coords_in_direction(current_node.coords, dir)};
@@ -939,7 +939,7 @@ void generate_v4(Maze_v8& maze, const Maze_v8::Coordinates starting_point)
             bool keep_checking = true;
 
             while (keep_checking && current_node.rnd_idx < 4) {
-                const auto dir = current_node.check_directions->at(current_node.rnd_idx);
+                const auto dir = current_node.check_directions->at(static_cast<std::size_t>(current_node.rnd_idx));
                 ++current_node.rnd_idx;
 
                 Maze_v8::Coordinates next_coords{maze.coords_in_direction(current_node.coords, dir)};
