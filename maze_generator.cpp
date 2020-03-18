@@ -1059,8 +1059,8 @@ static void BM_Visit_v4(benchmark::State& state)
     for (auto _ : state) {
         Maze_v4 maze(static_cast<int>(state.range(0)), static_cast<int>(state.range(0)));
         visit_v4(maze, {0, 0});
-        benchmark::DoNotOptimize(maze);
-    }
+        benchmark::DoNotOptimize(const_cast<const Maze_v4 &>(maze));
+   }
 }
 
 static void BM_Visit_v5(benchmark::State& state)
@@ -1068,7 +1068,7 @@ static void BM_Visit_v5(benchmark::State& state)
     for (auto _ : state) {
         Maze_v5 maze(static_cast<int>(state.range(0)), static_cast<int>(state.range(0)));
         visit_v5(maze, {0, 0});
-        benchmark::DoNotOptimize(maze);
+        benchmark::DoNotOptimize(const_cast<const Maze_v5 &>(maze));
     }
 }
 
@@ -1077,7 +1077,7 @@ static void BM_Visit_v6(benchmark::State& state)
     for (auto _ : state) {
         Maze_v6 maze(static_cast<int>(state.range(0)), static_cast<int>(state.range(0)));
         visit_v6(maze, {0, 0});
-        benchmark::DoNotOptimize(maze);
+        benchmark::DoNotOptimize(const_cast<const Maze_v6 &>(maze));
     }
 }
 
@@ -1086,7 +1086,7 @@ static void BM_Visit_v7(benchmark::State& state)
     for (auto _ : state) {
         Maze_v7 maze(static_cast<int>(state.range(0)), static_cast<int>(state.range(0)));
         visit_v7(maze, {0, 0});
-        benchmark::DoNotOptimize(maze);
+        benchmark::DoNotOptimize(const_cast<const Maze_v7 &>(maze));
     }
 }
 
@@ -1095,7 +1095,7 @@ static void BM_Generate_v1(benchmark::State& state)
     for (auto _ : state) {
         Maze_v7 maze(static_cast<int>(state.range(0)), static_cast<int>(state.range(0)));
         generate_v1(maze, {0, 0});
-        benchmark::DoNotOptimize(maze);
+        benchmark::DoNotOptimize(const_cast<const Maze_v7 &>(maze));
     }
 }
 
@@ -1104,7 +1104,7 @@ static void BM_Generate_v2(benchmark::State& state)
     for (auto _ : state) {
         Maze_v7 maze(static_cast<int>(state.range(0)), static_cast<int>(state.range(0)));
         generate_v2(maze, {0, 0});
-        benchmark::DoNotOptimize(maze);
+        benchmark::DoNotOptimize(const_cast<const Maze_v7 &>(maze));
     }
 }
 
@@ -1113,7 +1113,7 @@ static void BM_Generate_v3(benchmark::State& state)
     for (auto _ : state) {
         Maze_v8 maze(static_cast<int>(state.range(0)), static_cast<int>(state.range(0)));
         generate_v3(maze, {0, 0});
-        benchmark::DoNotOptimize(maze);
+        benchmark::DoNotOptimize(const_cast<const Maze_v8 &>(maze));
     }
 }
 
@@ -1122,7 +1122,7 @@ static void BM_Generate_v4(benchmark::State& state)
     for (auto _ : state) {
         Maze_v8 maze(static_cast<int>(state.range(0)), static_cast<int>(state.range(0)));
         generate_v4(maze, {0, 0});
-        benchmark::DoNotOptimize(maze);
+        benchmark::DoNotOptimize(const_cast<const Maze_v8 &>(maze));
     }
 }
 
@@ -1131,7 +1131,7 @@ static void BM_Generate_v5(benchmark::State& state)
     for (auto _ : state) {
         Maze_v9 maze(static_cast<int>(state.range(0)), static_cast<int>(state.range(0)));
         generate_v5(maze, {0, 0});
-        benchmark::DoNotOptimize(maze);
+        benchmark::DoNotOptimize(const_cast<const Maze_v9 &>(maze));
     }
 }
 
@@ -1140,7 +1140,7 @@ static void BM_Generate_v6(benchmark::State& state)
     for (auto _ : state) {
         Maze_v9 maze(static_cast<int>(state.range(0)), static_cast<int>(state.range(0)));
         generate_v6(maze, {0, 0});
-        benchmark::DoNotOptimize(maze);
+        benchmark::DoNotOptimize(const_cast<const Maze_v9 &>(maze));
     }
 }
 
