@@ -1,0 +1,100 @@
+2020-03-17 16:58:06	1000001	3118	1022	192.168.152.50	project.view	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
+2020-03-17 16:58:08	1000002	2640	1137	192.168.195.114	collection.view_archive	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 16:58:58	1000003	111	1121	192.168.228.209	user.delete	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 16:59:02	1000004	135	1060	192.168.194.102	doc.update	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 16:59:08	1000005	2356	1109	192.168.174.108	project.view	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 16:59:35	1000006	3745	1110	192.168.103.179	user.view	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 16:59:36	1000007	78	1148	192.168.103.216	collection.create	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 16:59:39	1000008	104	1055	192.168.242.142	project.delete	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
+2020-03-17 17:00:20	1000009	3586	1076	192.168.181.210	doc.view	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:00:23	1000010	144	1115	192.168.70.3	doc.update	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:00:46	1000011	2405	1123	192.168.203.194	file.view	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:01:06	1000012	34	1084	192.168.37.195	project.dialog_show	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:01:24	1000013	2269	1068	192.168.209.167	file.view_archive	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:01:25	1000014	60	1128	192.168.142.156	file.dialog_move	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:01:45	1000015	137	1011	192.168.200.95	project.download	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:02:38	1000016	57	1029	192.168.20.45	doc.delete	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:02:59	1000017	58	1126	192.168.196.138	doc.update	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:03:04	1000018	4983	1031	192.168.124.4	file.view_all	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:03:09	1000019	131	1010	192.168.26.217	collection.move	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:03:09	1000020	63	1200	192.168.215.61	collection.update	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:03:13	1000021	1357	1137	192.168.50.90	doc.view_archive	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:03:29	1000022	139	1057	192.168.161.116	file.move	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:03:41	1000023	3776	1176	192.168.60.193	file.view	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:03:44	1000024	123	1006	192.168.21.2	doc.update	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:03:44	1000025	52	1019	192.168.11.12	project.dialog_delete	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:03:49	1000026	67	1083	192.168.61.140	user.archive	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:03:52	1000027	2879	1104	192.168.251.132	user.view_archive	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:04:09	1000028	1837	1101	192.168.169.204	user.view_archive	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:04:09	1000029	127	1093	192.168.49.245	user.create	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:04:55	1000030	87	1187	192.168.206.231	project.archive	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:05:30	1000031	4677	1136	192.168.63.116	collection.view	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:05:37	1000032	95	1185	192.168.91.186	project.download	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:06:18	1000033	64	1085	192.168.155.37	collection.download	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:06:27	1000034	1334	1084	192.168.195.44	doc.view_all	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:06:55	1000035	88	1199	192.168.114.51	file.download	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:07:08	1000036	2503	1007	192.168.226.36	doc.view	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:07:13	1000037	130	1168	192.168.25.149	collection.create	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:07:16	1000038	2403	1054	192.168.153.93	file.view	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:07:21	1000039	4966	1160	192.168.28.98	project.view_archive	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:07:34	1000040	147	1130	192.168.225.162	user.delete	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:07:34	1000041	143	1058	192.168.153.180	doc.delete	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:08:00	1000042	113	1190	192.168.20.56	collection.create	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:08:23	1000043	98	1059	192.168.230.109	file.move	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
+2020-03-17 17:08:25	1000044	94	1113	192.168.105.224	doc.download	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:08:45	1000045	52	1043	192.168.94.194	collection.archive	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:09:02	1000046	1321	1104	192.168.193.97	doc.view_all	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:09:04	1000047	54	1039	192.168.63.187	project.update	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:09:20	1000048	69	1129	192.168.242.210	project.archive	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:09:35	1000049	39	1006	192.168.160.219	user.dialog_delete	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:09:58	1000050	55	1185	192.168.175.215	project.dialog_create	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:09:59	1000051	57	1018	192.168.66.4	file.dialog_move	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:10:10	1000052	73	1095	192.168.108.226	doc.archive	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:11:06	1000053	90	1165	192.168.190.85	project.delete	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:11:46	1000054	79	1100	192.168.10.21	file.delete	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:11:46	1000055	2190	1171	192.168.106.219	collection.view	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:11:46	1000056	3438	1095	192.168.242.20	file.view_archive	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:12:00	1000057	104	1189	192.168.205.192	user.delete	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:12:07	1000058	74	1039	192.168.4.128	file.move	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:12:07	1000059	109	1064	192.168.80.92	doc.archive	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:12:11	1000060	649	1086	192.168.107.191	user.view_archive	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
+2020-03-17 17:12:51	1000061	115	1075	192.168.77.212	collection.create	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:12:57	1000062	42	1017	192.168.3.253	user.dialog_move	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:13:04	1000063	67	1145	192.168.20.53	file.move	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:13:22	1000064	4896	1034	192.168.230.93	file.view_all	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:13:23	1000065	121	1139	192.168.79.85	collection.update	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:13:28	1000066	102	1127	192.168.247.100	project.download	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
+2020-03-17 17:13:48	1000067	128	1163	192.168.100.236	user.archive	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:13:53	1000068	86	1116	192.168.246.96	project.download	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:13:53	1000069	128	1165	192.168.139.72	collection.archive	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:13:53	1000070	4365	1190	192.168.66.20	project.view_all	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:13:55	1000071	3371	1006	192.168.51.224	project.view_all	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:14:12	1000072	112	1014	192.168.140.52	project.download	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:14:15	1000073	51	1174	192.168.35.233	collection.dialog_download	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:14:43	1000074	4432	1100	192.168.128.176	project.view_all	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:14:44	1000075	135	1091	192.168.152.137	collection.delete	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:14:48	1000076	3211	1035	192.168.234.210	doc.view_archive	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:14:51	1000077	144	1085	192.168.30.181	collection.move	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
+2020-03-17 17:14:56	1000078	88	1003	192.168.28.140	user.create	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:15:26	1000079	38	1176	192.168.254.8	file.dialog_delete	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:15:29	1000080	3992	1154	192.168.186.252	project.view_all	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:15:31	1000081	146	1100	192.168.79.114	doc.delete	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:15:34	1000082	3353	1096	192.168.75.146	project.view_archive	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:15:35	1000083	112	1098	192.168.149.239	project.archive	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:15:39	1000084	129	1122	192.168.167.143	project.create	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:15:40	1000085	3592	1053	192.168.129.8	collection.view_archive	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:16:18	1000086	87	1092	192.168.192.27	doc.move	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0
+2020-03-17 17:16:21	1000087	4884	1012	192.168.142.172	doc.view_archive	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:16:33	1000088	53	1187	192.168.171.140	collection.delete	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
+2020-03-17 17:16:33	1000089	85	1157	192.168.13.155	doc.download	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:17:19	1000090	114	1024	192.168.226.180	file.download	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:17:20	1000091	51	1110	192.168.192.76	doc.dialog_create	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:17:34	1000092	88	1023	192.168.171.219	doc.update	Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148
+2020-03-17 17:17:37	1000093	36	1094	192.168.92.250	user.dialog_show	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
+2020-03-17 17:17:37	1000094	107	1137	192.168.9.194	doc.archive	Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-en) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4
+2020-03-17 17:17:40	1000095	43	1035	192.168.21.234	doc.dialog_download	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
+2020-03-17 17:18:07	1000096	112	1116	192.168.199.138	project.move	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
+2020-03-17 17:18:13	1000097	4479	1092	192.168.149.37	doc.view	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:18:19	1000098	2899	1078	192.168.253.15	doc.view_all	Mozilla/5.0 (Linux; U; Android 2.2) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+2020-03-17 17:19:13	1000099	77	1146	192.168.13.53	doc.create	Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko
+2020-03-17 17:19:21	1000100	135	1008	192.168.149.171	doc.download	Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0

@@ -22,6 +22,7 @@ set(ALL_TARGETS
     project_euler
     mandelbrot
     maze_generator
+    read_performance_test_data
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
