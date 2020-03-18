@@ -7,7 +7,7 @@
 
 const std::string filename{"performance_test_data.txt"};
 
-std::vector<std::vector<std::string>> read_v01(const std::string& filename)
+std::vector<std::vector<std::string>> read(const std::string& filename)
 {
     std::ifstream in{filename};
     std::vector<std::vector<std::string>> datasets;
@@ -48,7 +48,7 @@ struct Dataset_v01 {
     std::string s7;
 };
 
-std::vector<Dataset_v01> read_v02(const std::string& filename)
+std::vector<Dataset_v01> read_dataset(const std::string& filename)
 {
     std::ifstream in{filename};
     std::vector<Dataset_v01> datasets;
@@ -65,7 +65,7 @@ std::vector<Dataset_v01> read_v02(const std::string& filename)
     return datasets;
 }
 
-std::vector<Dataset_v01> read_v03(const std::string& filename)
+std::vector<Dataset_v01> read_dataset_emplace_back(const std::string& filename)
 {
     std::ifstream in{filename};
     std::vector<Dataset_v01> datasets;
@@ -81,32 +81,32 @@ std::vector<Dataset_v01> read_v03(const std::string& filename)
     return datasets;
 }
 
-static void BM_Read_v01(benchmark::State& state)
+static void BM_Read(benchmark::State& state)
 {
     for (auto _ : state) {
-        auto datasets{read_v01(filename)};
+        auto datasets{read(filename)};
         benchmark::DoNotOptimize(datasets);
     }
 }
 
-static void BM_Read_v02(benchmark::State& state)
+static void BM_Read_Dataset_v01(benchmark::State& state)
 {
     for (auto _ : state) {
-        auto datasets{read_v02(filename)};
+        auto datasets{read_dataset(filename)};
         benchmark::DoNotOptimize(datasets);
     }
 }
 
-static void BM_Read_v03(benchmark::State& state)
+static void BM_Read_Dataset_v01_emplace_back(benchmark::State& state)
 {
     for (auto _ : state) {
-        auto datasets{read_v03(filename)};
+        auto datasets{read_dataset_emplace_back(filename)};
         benchmark::DoNotOptimize(datasets);
     }
 }
 
-BENCHMARK(BM_Read_v01);
-BENCHMARK(BM_Read_v02);
-BENCHMARK(BM_Read_v03);
+BENCHMARK(BM_Read);
+BENCHMARK(BM_Read_Dataset_v01);
+BENCHMARK(BM_Read_Dataset_v01_emplace_back);
 
 BENCHMARK_MAIN();
