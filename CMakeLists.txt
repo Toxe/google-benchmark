@@ -22,6 +22,7 @@ set(ALL_TARGETS
     project_euler
     mandelbrot
     maze_generator
+    string_concat
     string_split
     read_performance_test_data
 )
