@@ -98,7 +98,7 @@ std::vector<Dataset_v01> read_dataset_v01_emplace_back(const std::string& filena
     return datasets;
 }
 
-std::vector<std::vector<std::string>> read_v02(const std::string& filename)
+std::vector<std::vector<std::string>> read_v02_split_string(const std::string& filename)
 {
     std::ifstream in{filename};
     std::vector<std::vector<std::string>> line_values;
@@ -143,7 +143,7 @@ static void BM_Read_Dataset_v01_emplace_back(benchmark::State& state)
 static void BM_Read_v02_split_string(benchmark::State& state)
 {
     for (auto _ : state) {
-        auto line_values{read_v02(filename)};
+        auto line_values{read_v02_split_string(filename)};
         benchmark::DoNotOptimize(line_values);
     }
 }
