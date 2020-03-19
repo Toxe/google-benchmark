@@ -116,6 +116,41 @@ std::vector<std::vector<std::string>> read_v02_split_string(const std::string& f
     return line_values;
 }
 
+struct Dataset_v02_Position {
+    Dataset_v02_Position(std::string::size_type start, std::string::size_type end) : start_{start}, end_{end} {}
+    std::string::size_type start_;
+    std::string::size_type end_;
+};
+
+struct Dataset_v02 {
+    Dataset_v02(const std::string& line, char delim) {
+        std::string::size_type start_pos = 0;
+        std::string::size_type pos;
+
+        while ((pos = line.find(delim, start_pos)) != std::string::npos) {
+            positions.emplace_back(start_pos, pos);
+            start_pos = pos + 1;
+        }
+
+        if (start_pos < line.size())
+            positions.emplace_back(start_pos, line.size());
+    }
+
+    std::vector<Dataset_v02_Position> positions;
+};
+
+std::vector<Dataset_v02> read_dataset_v02(const std::string& filename)
+{
+    std::ifstream in{filename};
+    std::vector<Dataset_v02> datasets;
+    std::string line;
+
+    while (std::getline(in, line))
+        datasets.emplace_back(line, '\t');
+
+    return datasets;
+}
+
 static void BM_Read_v01(benchmark::State& state)
 {
     for (auto _ : state) {
@@ -148,9 +183,21 @@ static void BM_Read_v02_split_string(benchmark::State& state)
     }
 }
 
+static void BM_Read_Dataset_v02(benchmark::State& state)
+{
+    for (auto _ : state) {
+        auto datasets{read_dataset_v02(filename)};
+        benchmark::DoNotOptimize(datasets);
+    }
+}
+
 BENCHMARK(BM_Read_v01);
+
 BENCHMARK(BM_Read_Dataset_v01);
 BENCHMARK(BM_Read_Dataset_v01_emplace_back);
+
 BENCHMARK(BM_Read_v02_split_string);
+
+BENCHMARK(BM_Read_Dataset_v02);
 
 BENCHMARK_MAIN();
