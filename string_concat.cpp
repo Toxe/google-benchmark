@@ -1,5 +1,6 @@
 #include <benchmark/benchmark.h>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -27,6 +28,16 @@ std::string concat_strings(const std::vector<std::string>& strings)
     return big;
 }
 
+std::string concat_strings_with_stringstream(const std::vector<std::string>& strings)
+{
+    std::stringstream big;
+
+    for (const auto& s : strings)
+        big << s;
+
+    return big.str();
+}
+
 std::string concat_string_sets(const std::vector<std::vector<std::string>>& string_sets, const std::string& delim)
 {
     std::string big;
@@ -42,10 +53,33 @@ std::string concat_string_sets(const std::vector<std::vector<std::string>>& stri
     return big;
 }
 
+std::string concat_string_sets_with_stringstream(const std::vector<std::vector<std::string>>& string_sets, const std::string& delim)
+{
+    std::stringstream big;
+
+    for (std::size_t i = 0; i < string_sets.size(); ++i) {
+        for (const auto& s : string_sets[i])
+            big << s;
+
+        if (i < (string_sets.size() - 1))
+            big << delim;
+    }
+
+    return big.str();
+}
+
 static void BM_ConcatStrings(benchmark::State& state)
 {
     for (auto _ : state) {
         auto s{concat_strings(test_strings)};
+        benchmark::DoNotOptimize(s);
+    }
+}
+
+static void BM_ConcatStrings_with_Stringstream(benchmark::State& state)
+{
+    for (auto _ : state) {
+        auto s{concat_strings_with_stringstream(test_strings)};
         benchmark::DoNotOptimize(s);
     }
 }
@@ -58,7 +92,18 @@ static void BM_ConcatStringSets(benchmark::State& state)
     }
 }
 
+static void BM_ConcatStringSets_with_Stringstream(benchmark::State& state)
+{
+    for (auto _ : state) {
+        auto s{concat_string_sets_with_stringstream(test_string_sets, ",")};
+        benchmark::DoNotOptimize(s);
+    }
+}
+
 BENCHMARK(BM_ConcatStrings);
+BENCHMARK(BM_ConcatStrings_with_Stringstream);
+
 BENCHMARK(BM_ConcatStringSets);
+BENCHMARK(BM_ConcatStringSets_with_Stringstream);
 
 BENCHMARK_MAIN();
