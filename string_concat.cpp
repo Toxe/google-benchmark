@@ -49,6 +49,25 @@ struct Dataset_v02 {
     std::vector<Dataset_v02_Position> positions;
 };
 
+struct Dataset_v03 {
+    Dataset_v03(const std::string& line, char delim) : line_{line} {
+        std::string::size_type start_pos = 0;
+        std::string::size_type pos;
+
+        while ((pos = line_.find(delim, start_pos)) != std::string::npos) {
+            positions.push_back(line_.data() + start_pos);
+            *(line_.data() + pos) = '\0';
+            start_pos = pos + 1;
+        }
+
+        if (start_pos < line_.size())
+            positions.push_back(line_.data() + start_pos);
+    }
+
+    std::string line_;
+    std::vector<const char*> positions;
+};
+
 std::string concat_strings(const std::vector<std::string>& strings)
 {
     std::string big;
@@ -117,6 +136,53 @@ std::string concat_strings_with_dataset_v02(const std::vector<Dataset_v02>& data
     return big;
 }
 
+std::string concat_strings_with_dataset_v03(const std::vector<Dataset_v03>& datasets, const std::string& delim)
+{
+    std::string big;
+
+    for (std::size_t i = 0; i < datasets.size(); ++i) {
+        const auto& ds{datasets[i]};
+
+        for (const auto& pos : ds.positions)
+            big += std::string{pos};
+
+        if (i < (datasets.size() - 1))
+            big += delim;
+    }
+
+    return big;
+}
+
+std::string concat_strings_with_dataset_v03_operator_plus(const std::vector<Dataset_v03>& datasets, const std::string& delim)
+{
+    std::string big;
+
+    for (std::size_t i = 0; i < datasets.size(); ++i) {
+        for (const auto& pos : datasets[i].positions)
+            big += pos;
+
+        if (i < (datasets.size() - 1))
+            big += delim;
+    }
+
+    return big;
+}
+
+std::string concat_strings_with_dataset_v03_iterators(const std::vector<Dataset_v03>& datasets, const std::string& delim)
+{
+    std::string big;
+
+    for (auto p = datasets.cbegin(); p != datasets.cend(); ++p) {
+        if (p != datasets.cbegin())
+            big += delim;
+
+        for (const auto& pos : p->positions)
+            big += pos;
+    }
+
+    return big;
+}
+
 static void BM_ConcatStrings(benchmark::State& state)
 {
     for (auto _ : state) {
@@ -149,7 +215,7 @@ static void BM_ConcatStringSets_with_Stringstream(benchmark::State& state)
     }
 }
 
-static void BM_ConcatStrings_with_Dataset_v02(benchmark::State& state)
+static void BM_ConcatStrings_with_Dataset_v02_start_and_end_positions(benchmark::State& state)
 {
     std::vector<Dataset_v02> datasets;
 
@@ -162,12 +228,54 @@ static void BM_ConcatStrings_with_Dataset_v02(benchmark::State& state)
     }
 }
 
+static void BM_ConcatStrings_with_Dataset_v03_char_pointer(benchmark::State& state)
+{
+    std::vector<Dataset_v03> datasets;
+
+    for (const auto& line : test_strings_one_line)
+        datasets.emplace_back(line, '\t');
+
+    for (auto _ : state) {
+        auto s{concat_strings_with_dataset_v03(datasets, ",")};
+        benchmark::DoNotOptimize(s);
+    }
+}
+
+static void BM_ConcatStrings_with_Dataset_v03_operator_plus(benchmark::State& state)
+{
+    std::vector<Dataset_v03> datasets;
+
+    for (const auto& line : test_strings_one_line)
+        datasets.emplace_back(line, '\t');
+
+    for (auto _ : state) {
+        auto s{concat_strings_with_dataset_v03_operator_plus(datasets, ",")};
+        benchmark::DoNotOptimize(s);
+    }
+}
+
+static void BM_ConcatStrings_with_Dataset_v03_iterators(benchmark::State& state)
+{
+    std::vector<Dataset_v03> datasets;
+
+    for (const auto& line : test_strings_one_line)
+        datasets.emplace_back(line, '\t');
+
+    for (auto _ : state) {
+        auto s{concat_strings_with_dataset_v03_iterators(datasets, ",")};
+        benchmark::DoNotOptimize(s);
+    }
+}
+
 BENCHMARK(BM_ConcatStrings);
 BENCHMARK(BM_ConcatStrings_with_Stringstream);
 
 BENCHMARK(BM_ConcatStringSets);
 BENCHMARK(BM_ConcatStringSets_with_Stringstream);
 
-BENCHMARK(BM_ConcatStrings_with_Dataset_v02);
+BENCHMARK(BM_ConcatStrings_with_Dataset_v02_start_and_end_positions);
+BENCHMARK(BM_ConcatStrings_with_Dataset_v03_char_pointer);
+BENCHMARK(BM_ConcatStrings_with_Dataset_v03_operator_plus);
+BENCHMARK(BM_ConcatStrings_with_Dataset_v03_iterators);
 
 BENCHMARK_MAIN();
