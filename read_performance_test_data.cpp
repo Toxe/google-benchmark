@@ -123,7 +123,7 @@ struct Dataset_v02_Position {
 };
 
 struct Dataset_v02 {
-    Dataset_v02(const std::string& line, char delim) {
+    Dataset_v02(const std::string& line, char delim) : line_{line} {
         std::string::size_type start_pos = 0;
         std::string::size_type pos;
 
@@ -136,6 +136,7 @@ struct Dataset_v02 {
             positions.emplace_back(start_pos, line.size());
     }
 
+    const std::string line_;
     std::vector<Dataset_v02_Position> positions;
 };
 
