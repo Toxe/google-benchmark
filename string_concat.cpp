@@ -1,5 +1,6 @@
 #include <benchmark/benchmark.h>
 #include <iostream>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -88,6 +89,11 @@ std::string concat_strings_with_stringstream(const std::vector<std::string>& str
     return big.str();
 }
 
+std::string concat_strings_with_accumulate(const std::vector<std::string>& strings)
+{
+    return std::accumulate(std::next(strings.begin()), strings.end(), strings[0]);
+}
+
 std::string concat_string_sets(const std::vector<std::vector<std::string>>& string_sets, const std::string& delim)
 {
     std::string big;
@@ -116,6 +122,21 @@ std::string concat_string_sets_with_stringstream(const std::vector<std::vector<s
     }
 
     return big.str();
+}
+
+std::string concat_string_sets_with_accumulate(const std::vector<std::vector<std::string>>& string_sets, const std::string& delim)
+{
+    std::string big;
+
+    for (std::size_t i = 0; i < string_sets.size(); ++i) {
+        big += std::accumulate(std::next(string_sets[i].begin()), string_sets[i].end(), string_sets[i][0]);
+
+        if (i < (string_sets.size() - 1))
+            big += delim;
+    }
+
+    return big;
+
 }
 
 std::string concat_strings_with_dataset_v02(const std::vector<Dataset_v02>& datasets, const std::string& delim)
@@ -183,6 +204,20 @@ std::string concat_strings_with_dataset_v03_iterators(const std::vector<Dataset_
     return big;
 }
 
+std::string concat_strings_with_dataset_v03_accumulate(const std::vector<Dataset_v03>& datasets, const std::string& delim)
+{
+    std::string big;
+
+    for (auto p = datasets.cbegin(); p != datasets.cend(); ++p) {
+        if (p != datasets.cbegin())
+            big += delim;
+
+        big += std::accumulate(std::next(p->positions.begin()), p->positions.end(), std::string{p->positions[0]});
+    }
+
+    return big;
+}
+
 static void BM_ConcatStrings(benchmark::State& state)
 {
     for (auto _ : state) {
@@ -199,6 +234,14 @@ static void BM_ConcatStrings_with_Stringstream(benchmark::State& state)
     }
 }
 
+static void BM_ConcatStrings_with_accumulate(benchmark::State& state)
+{
+    for (auto _ : state) {
+        auto s{concat_strings_with_accumulate(test_strings_splitted)};
+        benchmark::DoNotOptimize(s);
+    }
+}
+
 static void BM_ConcatStringSets(benchmark::State& state)
 {
     for (auto _ : state) {
@@ -211,6 +254,14 @@ static void BM_ConcatStringSets_with_Stringstream(benchmark::State& state)
 {
     for (auto _ : state) {
         auto s{concat_string_sets_with_stringstream(test_string_sets, ",")};
+        benchmark::DoNotOptimize(s);
+    }
+}
+
+static void BM_ConcatStringSets_with_accumulate(benchmark::State& state)
+{
+    for (auto _ : state) {
+        auto s{concat_string_sets_with_accumulate(test_string_sets, ",")};
         benchmark::DoNotOptimize(s);
     }
 }
@@ -267,15 +318,31 @@ static void BM_ConcatStrings_with_Dataset_v03_iterators(benchmark::State& state)
     }
 }
 
+static void BM_ConcatStrings_with_Dataset_v03_accumulate(benchmark::State& state)
+{
+    std::vector<Dataset_v03> datasets;
+
+    for (const auto& line : test_strings_one_line)
+        datasets.emplace_back(line, '\t');
+
+    for (auto _ : state) {
+        auto s{concat_strings_with_dataset_v03_accumulate(datasets, ",")};
+        benchmark::DoNotOptimize(s);
+    }
+}
+
 BENCHMARK(BM_ConcatStrings);
 BENCHMARK(BM_ConcatStrings_with_Stringstream);
+BENCHMARK(BM_ConcatStrings_with_accumulate);
 
 BENCHMARK(BM_ConcatStringSets);
 BENCHMARK(BM_ConcatStringSets_with_Stringstream);
+BENCHMARK(BM_ConcatStringSets_with_accumulate);
 
 BENCHMARK(BM_ConcatStrings_with_Dataset_v02_start_and_end_positions);
 BENCHMARK(BM_ConcatStrings_with_Dataset_v03_char_pointer);
 BENCHMARK(BM_ConcatStrings_with_Dataset_v03_operator_plus);
 BENCHMARK(BM_ConcatStrings_with_Dataset_v03_iterators);
+BENCHMARK(BM_ConcatStrings_with_Dataset_v03_accumulate);
 
 BENCHMARK_MAIN();
